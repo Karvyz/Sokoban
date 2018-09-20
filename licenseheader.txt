@@ -1,0 +1,30 @@
+<#if licenseFirst??>
+${licenseFirst}
+</#if>
+${licensePrefix}Sokoban - Encore une nouvelle version (à but pédagogique) du célèbre jeu
+${licensePrefix}Copyright (C) 2018 Guillaume Huard
+${licensePrefix}
+${licensePrefix}Ce programme est libre, vous pouvez le redistribuer et/ou le
+${licensePrefix}modifier selon les termes de la Licence Publique Générale GNU publiée par la
+${licensePrefix}Free Software Foundation (version 2 ou bien toute autre version ultérieure
+${licensePrefix}choisie par vous).
+${licensePrefix}
+${licensePrefix}Ce programme est distribué car potentiellement utile, mais SANS
+${licensePrefix}AUCUNE GARANTIE, ni explicite ni implicite, y compris les garanties de
+${licensePrefix}commercialisation ou d'adaptation dans un but spécifique. Reportez-vous à la
+${licensePrefix}Licence Publique Générale GNU pour plus de détails.
+${licensePrefix}
+${licensePrefix}Vous devez avoir reçu une copie de la Licence Publique Générale
+${licensePrefix}GNU en même temps que ce programme ; si ce n'est pas le cas, écrivez à la Free
+${licensePrefix}Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307,
+${licensePrefix}États-Unis.
+${licensePrefix}
+${licensePrefix}Contact:
+${licensePrefix}         Guillaume.Huard@imag.fr
+${licensePrefix}         Laboratoire LIG
+${licensePrefix}         700 avenue centrale
+${licensePrefix}         Domaine universitaire
+${licensePrefix}         38401 Saint Martin d'Hères
+<#if licenseLast??>
+${licenseLast}
+</#if>

@@ -1,3 +1,4 @@
+package Structures;
 /*
  * Sokoban - Encore une nouvelle version (à but pédagogique) du célèbre jeu
  * Copyright (C) 2018 Guillaume Huard
@@ -25,16 +26,32 @@
  *          38401 Saint Martin d'Hères
  */
 
-public abstract class FAP<E extends Comparable<E>> {
-	Sequence<E> s;
+public class FAPListe<E extends Comparable<E>> extends FAP<E> {
+	SequenceListe<E> s;
 
-	abstract void insere(E element);
-
-	public E extrait() {
-		return s.extraitTete();
+	public FAPListe() {
+		s = new SequenceListe<>();
+		super.s = s;
 	}
 
-	public boolean estVide() {
-		return s.estVide();
+	@Override
+	public void insere(E element) {
+		Maillon<E> precedent, courant;
+
+		precedent = null;
+		courant = s.tete;
+		while ((courant != null) && (element.compareTo(courant.element) > 0)) {
+			precedent = courant;
+			courant = courant.suivant;
+		}
+
+		Maillon<E> m = new Maillon<>(element, courant);
+		if (precedent == null) {
+			s.tete = m;
+		} else {
+			precedent.suivant = m;
+		}
+		if (courant == null)
+			s.queue = m;
 	}
 }

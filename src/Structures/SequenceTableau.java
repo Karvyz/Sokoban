@@ -1,4 +1,4 @@
-/*
+package Structures;/*
  * Sokoban - Encore une nouvelle version (à but pédagogique) du célèbre jeu
  * Copyright (C) 2018 Guillaume Huard
  * 
@@ -25,60 +25,73 @@
  *          38401 Saint Martin d'Hères
  */
 
-public class SequenceListe<E> implements Sequence<E> {
-	Maillon<E> tete, queue;
+public class SequenceTableau<E> implements Sequence<E> {
+	Object[] elements;
+	int taille, debut;
 
-	// Les méthodes implémentant l'interface
-	// doivent être publiques
-	@Override
-	public void insereQueue(E element) {
-		Maillon<E> m = new Maillon<>(element, null);
-		if (queue == null) {
-			tete = queue = m;
-		} else {
-			queue.suivant = m;
-			queue = m;
+	public SequenceTableau() {
+		// Taille par défaut
+		elements = new Object[1];
+		debut = 0;
+		taille = 0;
+	}
+
+	protected void redimensionne() {
+		if (taille >= elements.length) {
+			int nouvelleCapacite = taille * 2;
+			Object[] nouveau;
+
+			nouveau = new Object[nouvelleCapacite];
+			int aCopier = taille;
+			for (int i = 0; i < aCopier; i++)
+				nouveau[i] = extraitTete();
+			debut = 0;
+			taille = aCopier;
+			elements = nouveau;
 		}
 	}
 
 	@Override
 	public void insereTete(E element) {
-		Maillon<E> m = new Maillon<>(element, tete);
-		if (tete == null) {
-			tete = queue = m;
-		} else {
-			tete = m;
-		}
+		redimensionne();
+		debut = debut - 1;
+		if (debut < 0)
+			debut = elements.length - 1;
+		elements[debut] = element;
+		taille++;
+	}
+
+	@Override
+	public void insereQueue(E element) {
+		redimensionne();
+		elements[(debut + taille) % elements.length] = element;
+		taille++;
 	}
 
 	@Override
 	public E extraitTete() {
-		E resultat;
-		// Exception si tete == null (sequence vide)
-		resultat = tete.element;
-		tete = tete.suivant;
-		if (tete == null) {
-			queue = null;
-		}
+		// Resultat invalide si la sequence est vide
+		@SuppressWarnings("unchecked")
+		E resultat = (E) elements[debut];
+		debut = (debut + 1) % elements.length;
+		taille--;
 		return resultat;
 	}
 
 	@Override
 	public boolean estVide() {
-		return tete == null;
+		return taille == 0;
 	}
 
 	@Override
 	public String toString() {
-		String resultat = "SequenceListe [ ";
-		boolean premier = true;
-		Maillon<E> m = tete;
-		while (m != null) {
-			if (!premier)
+		String resultat = "SequenceTable [ ";
+		int pos = debut;
+		for (int i = 0; i < taille; i++) {
+			if (i > 0)
 				resultat += ", ";
-			resultat += m.element;
-			m = m.suivant;
-			premier = false;
+			resultat += elements[pos];
+			pos = (pos + 1) % elements.length;
 		}
 		resultat += " ]";
 		return resultat;
@@ -86,6 +99,6 @@ public class SequenceListe<E> implements Sequence<E> {
 
 	@Override
 	public Iterateur<E> iterateur() {
-		return new IterateurSequenceListe<>(this);
+		return new IterateurSequenceTableau<>(this);
 	}
 }

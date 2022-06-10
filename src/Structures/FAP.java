@@ -1,3 +1,4 @@
+package Structures;
 /*
  * Sokoban - Encore une nouvelle version (à but pédagogique) du célèbre jeu
  * Copyright (C) 2018 Guillaume Huard
@@ -25,54 +26,16 @@
  *          38401 Saint Martin d'Hères
  */
 
-import java.util.NoSuchElementException;
+public abstract class FAP<E extends Comparable<E>> {
+	Sequence<E> s;
 
-class IterateurSequenceListe<T> implements Iterateur<T> {
+	abstract void insere(E element);
 
-	SequenceListe<T> e;
-	Maillon<T> pprec, prec, courant;
-	boolean last;
-
-	IterateurSequenceListe(SequenceListe<T> e) {
-		this.e = e;
-		pprec = prec = null;
-		courant = e.tete;
-		last = false;
+	public E extrait() {
+		return s.extraitTete();
 	}
 
-	@Override
-	public boolean aProchain() {
-		return courant != null;
-	}
-
-	@Override
-	public T prochain() {
-		if (aProchain()) {
-			pprec = prec;
-			prec = courant;
-			courant = courant.suivant;
-			last = true;
-			return prec.element;
-		} else {
-			throw new NoSuchElementException();
-		}
-	}
-
-	@Override
-	public void supprime() {
-		if (last) {
-			if (pprec == null) {
-				e.tete = courant;
-			} else {
-				pprec.suivant = courant;
-			}
-			if (prec == e.queue) {
-				e.queue = pprec;
-			}
-			prec = pprec;
-			last = false;
-		} else {
-			throw new IllegalStateException();
-		}
+	public boolean estVide() {
+		return s.estVide();
 	}
 }

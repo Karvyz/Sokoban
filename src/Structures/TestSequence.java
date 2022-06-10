@@ -1,3 +1,4 @@
+package Structures;
 /*
  * Sokoban - Encore une nouvelle version (à but pédagogique) du célèbre jeu
  * Copyright (C) 2018 Guillaume Huard
@@ -24,6 +25,11 @@
  *          Domaine universitaire
  *          38401 Saint Martin d'Hères
  */
+
+import Structures.Iterateur;
+import Structures.Sequence;
+import Structures.SequenceListe;
+import Structures.SequenceTableau;
 
 import java.util.Random;
 

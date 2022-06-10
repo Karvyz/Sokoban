@@ -25,29 +25,41 @@
  *          38401 Saint Martin d'Hères
  */
 
-import Global.Configuration;
+import javax.swing.*;
+import java.awt.*;
 
-import java.io.InputStream;
+// L'interface runnable déclare une méthode run
+public class InterfaceGraphique implements Runnable {
+	Jeu j;
+	JFrame frame;
+	boolean maximized;
 
-public class Sokoban {
-	public static void main(String[] args) {
-		InputStream in;
-		in = Configuration.charge("Niveaux/Original.txt");
-		Configuration.info("Niveaux trouvés");
+	InterfaceGraphique(Jeu jeu) {
+		j = jeu;
+	}
 
-		LecteurNiveaux l = new LecteurNiveaux(in);
-		Jeu j = new Jeu(l);
-		int num = 1;
-		if (args.length > 0)
-			num = Integer.parseInt(args[0]);
-		Configuration.info("Affichage du Niveau " + num);
-		while (num != 0) {
-			if (!j.prochainNiveau()) {
-				Configuration.info("Pas assez de niveaux dans le fichier de niveaux");
-				System.exit(2);
-			}
-			num--;
+	static void demarrer(Jeu j) {
+		SwingUtilities.invokeLater(new InterfaceGraphique(j));
+	}
+
+	public void toggleFullscreen() {
+		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		GraphicsDevice device = env.getDefaultScreenDevice();
+		if (maximized) {
+			device.setFullScreenWindow(null);
+			maximized = false;
+		} else {
+			device.setFullScreenWindow(frame);
+			maximized = true;
 		}
-		InterfaceGraphique.demarrer(j);
+	}
+
+	public void run() {
+		frame = new JFrame("Ma fenetre a moi");
+		frame.add(new NiveauGraphique(j));
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(500, 300);
+		//toggleFullscreen();
+		frame.setVisible(true);
 	}
 }

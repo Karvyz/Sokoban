@@ -24,30 +24,25 @@
  *          Domaine universitaire
  *          38401 Saint Martin d'Hères
  */
+public class Jeu {
+	Niveau n;
+	LecteurNiveaux l;
 
-import Global.Configuration;
+	Jeu(LecteurNiveaux lect) {
+		l = lect;
+	}
 
-import java.io.InputStream;
+	public Niveau niveau() {
+		return n;
+	}
 
-public class Sokoban {
-	public static void main(String[] args) {
-		InputStream in;
-		in = Configuration.charge("Niveaux/Original.txt");
-		Configuration.info("Niveaux trouvés");
-
-		LecteurNiveaux l = new LecteurNiveaux(in);
-		Jeu j = new Jeu(l);
-		int num = 1;
-		if (args.length > 0)
-			num = Integer.parseInt(args[0]);
-		Configuration.info("Affichage du Niveau " + num);
-		while (num != 0) {
-			if (!j.prochainNiveau()) {
-				Configuration.info("Pas assez de niveaux dans le fichier de niveaux");
-				System.exit(2);
-			}
-			num--;
+	public boolean prochainNiveau() {
+		Niveau nouveau = l.lisProchainNiveau();
+		if (nouveau != null) {
+			n = nouveau;
+			return true;
+		} else {
+			return false;
 		}
-		InterfaceGraphique.demarrer(j);
 	}
 }

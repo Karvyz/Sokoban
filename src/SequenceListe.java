@@ -25,22 +25,14 @@
  *          38401 Saint Martin d'Hères
  */
 
-class SequenceListe implements Sequence {
-	Maillon tete, queue;
+public class SequenceListe<E> implements Sequence<E> {
+	Maillon<E> tete, queue;
 
 	// Les méthodes implémentant l'interface
 	// doivent être publiques
 	@Override
-	public void insereTete(int element) {
-		Maillon m = new Maillon(element, tete);
-		if (queue == null)
-			queue = m;
-		tete = m;
-	}
-
-	@Override
-	public void insereQueue(int element) {
-		Maillon m = new Maillon(element, null);
+	public void insereQueue(E element) {
+		Maillon<E> m = new Maillon<>(element, null);
 		if (queue == null) {
 			tete = queue = m;
 		} else {
@@ -50,8 +42,18 @@ class SequenceListe implements Sequence {
 	}
 
 	@Override
-	public int extraitTete() {
-		int resultat;
+	public void insereTete(E element) {
+		Maillon<E> m = new Maillon<>(element, tete);
+		if (tete == null) {
+			tete = queue = m;
+		} else {
+			tete = m;
+		}
+	}
+
+	@Override
+	public E extraitTete() {
+		E resultat;
 		// Exception si tete == null (sequence vide)
 		resultat = tete.element;
 		tete = tete.suivant;
@@ -70,7 +72,7 @@ class SequenceListe implements Sequence {
 	public String toString() {
 		String resultat = "SequenceListe [ ";
 		boolean premier = true;
-		Maillon m = tete;
+		Maillon<E> m = tete;
 		while (m != null) {
 			if (!premier)
 				resultat += ", ";
@@ -83,7 +85,7 @@ class SequenceListe implements Sequence {
 	}
 
 	@Override
-	public Iterateur iterateur() {
-		return new IterateurSequenceListe(this);
+	public Iterateur<E> iterateur() {
+		return new IterateurSequenceListe<>(this);
 	}
 }

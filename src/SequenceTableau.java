@@ -25,23 +25,23 @@
  *          38401 Saint Martin d'Hères
  */
 
-class SequenceTableau implements Sequence {
-	int[] elements;
+public class SequenceTableau<E> implements Sequence<E> {
+	Object[] elements;
 	int taille, debut;
 
 	public SequenceTableau() {
 		// Taille par défaut
-		elements = new int[1];
+		elements = new Object[1];
 		debut = 0;
 		taille = 0;
 	}
 
-	private void redimensionne() {
+	protected void redimensionne() {
 		if (taille >= elements.length) {
 			int nouvelleCapacite = taille * 2;
-			int[] nouveau;
+			Object[] nouveau;
 
-			nouveau = new int[nouvelleCapacite];
+			nouveau = new Object[nouvelleCapacite];
 			int aCopier = taille;
 			for (int i = 0; i < aCopier; i++)
 				nouveau[i] = extraitTete();
@@ -52,7 +52,7 @@ class SequenceTableau implements Sequence {
 	}
 
 	@Override
-	public void insereTete(int element) {
+	public void insereTete(E element) {
 		redimensionne();
 		debut = debut - 1;
 		if (debut < 0)
@@ -62,16 +62,17 @@ class SequenceTableau implements Sequence {
 	}
 
 	@Override
-	public void insereQueue(int element) {
+	public void insereQueue(E element) {
 		redimensionne();
 		elements[(debut + taille) % elements.length] = element;
 		taille++;
 	}
 
 	@Override
-	public int extraitTete() {
+	public E extraitTete() {
 		// Resultat invalide si la sequence est vide
-		int resultat = elements[debut];
+		@SuppressWarnings("unchecked")
+		E resultat = (E) elements[debut];
 		debut = (debut + 1) % elements.length;
 		taille--;
 		return resultat;
@@ -97,7 +98,7 @@ class SequenceTableau implements Sequence {
 	}
 
 	@Override
-	public Iterateur iterateur() {
-		return new IterateurSequenceTableau(this);
+	public Iterateur<E> iterateur() {
+		return new IterateurSequenceTableau<>(this);
 	}
 }

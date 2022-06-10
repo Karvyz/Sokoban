@@ -24,14 +24,15 @@
  *          Domaine universitaire
  *          38401 Saint Martin d'Hères
  */
+
 import java.util.NoSuchElementException;
 
-class IterateurSequenceTableau implements Iterateur {
+class IterateurSequenceTableau<T> implements Iterateur<T> {
 
-	SequenceTableau e;
+	SequenceTableau<T> e;
 	int position, rang, last;
 
-	IterateurSequenceTableau(SequenceTableau e) {
+	IterateurSequenceTableau(SequenceTableau<T> e) {
 		this.e = e;
 		rang = 0;
 		position = e.debut;
@@ -43,13 +44,14 @@ class IterateurSequenceTableau implements Iterateur {
 		return rang < e.taille;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public int prochain() {
+	public T prochain() {
 		if (aProchain()) {
 			last = position;
 			position = (position + 1) % e.elements.length;
 			rang++;
-			return e.elements[last];
+			return (T) e.elements[last];
 		} else {
 			throw new NoSuchElementException();
 		}

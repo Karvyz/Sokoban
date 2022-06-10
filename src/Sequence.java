@@ -25,14 +25,14 @@
  *          38401 Saint Martin d'Hères
  */
 
-interface Sequence {
-	void insereTete(int element);
+public interface Sequence<E> {
+	void insereQueue(E element);
 
-	void insereQueue(int element);
+	void insereTete(E element);
 
-	int extraitTete();
+	E extraitTete();
 
 	boolean estVide();
 
-	Iterateur iterateur();
+	Iterateur<E> iterateur();
 }

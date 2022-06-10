@@ -25,11 +25,11 @@
  *          38401 Saint Martin d'Hères
  */
 
-class Maillon {
-	int element;
-	Maillon suivant;
+class Maillon<E> {
+	E element;
+	Maillon<E> suivant;
 
-	Maillon(int element, Maillon suivant) {
+	Maillon(E element, Maillon<E> suivant) {
 		this.element = element;
 		this.suivant = suivant;
 	}

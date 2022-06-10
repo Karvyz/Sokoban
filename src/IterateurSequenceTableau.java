@@ -24,66 +24,55 @@
  *          Domaine universitaire
  *          38401 Saint Martin d'Hères
  */
+import java.util.NoSuchElementException;
 
-class SequenceListe implements Sequence {
-	Maillon tete, queue;
+class IterateurSequenceTableau implements Iterateur {
 
-	// Les méthodes implémentant l'interface
-	// doivent être publiques
-	@Override
-	public void insereTete(int element) {
-		Maillon m = new Maillon(element, tete);
-		if (queue == null)
-			queue = m;
-		tete = m;
+	SequenceTableau e;
+	int position, rang, last;
+
+	IterateurSequenceTableau(SequenceTableau e) {
+		this.e = e;
+		rang = 0;
+		position = e.debut;
+		last = -1;
 	}
 
 	@Override
-	public void insereQueue(int element) {
-		Maillon m = new Maillon(element, null);
-		if (queue == null) {
-			tete = queue = m;
+	public boolean aProchain() {
+		return rang < e.taille;
+	}
+
+	@Override
+	public int prochain() {
+		if (aProchain()) {
+			last = position;
+			position = (position + 1) % e.elements.length;
+			rang++;
+			return e.elements[last];
 		} else {
-			queue.suivant = m;
-			queue = m;
+			throw new NoSuchElementException();
 		}
 	}
 
 	@Override
-	public int extraitTete() {
-		int resultat;
-		// Exception si tete == null (sequence vide)
-		resultat = tete.element;
-		tete = tete.suivant;
-		if (tete == null) {
-			queue = null;
+	public void supprime() {
+		if (last != -1) {
+			// On recule
+			position = last;
+			// On décale les éléments qui suivent
+			int courant = rang;
+			while (courant < e.taille) {
+				int next = (last + 1) % e.elements.length;
+				e.elements[last] = e.elements[next];
+				last = next;
+				courant++;
+			}
+			last = -1;
+			rang--;
+			e.taille--;
+		} else {
+			throw new IllegalStateException();
 		}
-		return resultat;
-	}
-
-	@Override
-	public boolean estVide() {
-		return tete == null;
-	}
-
-	@Override
-	public String toString() {
-		String resultat = "SequenceListe [ ";
-		boolean premier = true;
-		Maillon m = tete;
-		while (m != null) {
-			if (!premier)
-				resultat += ", ";
-			resultat += m.element;
-			m = m.suivant;
-			premier = false;
-		}
-		resultat += " ]";
-		return resultat;
-	}
-
-	@Override
-	public Iterateur iterateur() {
-		return new IterateurSequenceListe(this);
 	}
 }

@@ -95,4 +95,9 @@ class SequenceTableau implements Sequence {
 		resultat += " ]";
 		return resultat;
 	}
+
+	@Override
+	public Iterateur iterateur() {
+		return new IterateurSequenceTableau(this);
+	}
 }

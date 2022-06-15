@@ -11,8 +11,7 @@ public class Configuration {
 	public static InputStream charge(String s) {
 		InputStream in = null;
 		try {
-			s = s.replace('/', File.separatorChar);
-			in = new FileInputStream("res" + File.separator + s);
+			in = new FileInputStream("res/" + s);
 		} catch (FileNotFoundException e) {
 			erreur("impossible de trouver le fichier " + s);
 		}

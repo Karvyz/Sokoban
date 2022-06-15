@@ -37,8 +37,7 @@ class AireDeDessin extends JComponent {
 	public AireDeDessin() {
 		try {
 			// Chargement de l'image de la même manière que le fichier de niveaux
-			InputStream in = new FileInputStream("res" + File.separator +
-					"Images" + File.separator + "Pousseur.png");
+			InputStream in = new FileInputStream("res/Images/Pousseur.png");
 			// Chargement d'une image utilisable dans Swing
 			img = ImageIO.read(in);
 		} catch (FileNotFoundException e) {

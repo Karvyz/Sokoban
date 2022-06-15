@@ -34,7 +34,7 @@ public class Sokoban {
 	public static void main(String[] args) {
 		InputStream in;
 		try {
-			in = new FileInputStream("res" + File.separator + "Niveaux" + File.separator + "Original.txt");
+			in = new FileInputStream("res/Niveaux/Original.txt");
 
 			LecteurNiveaux l = new LecteurNiveaux(in);
 			RedacteurNiveau r = new RedacteurNiveau(System.out);

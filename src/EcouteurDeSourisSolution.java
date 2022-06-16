@@ -25,18 +25,20 @@
  *          38401 Saint Martin d'Hères
  */
 
-import Global.Configuration;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-import java.io.InputStream;
+public class EcouteurDeSourisSolution extends MouseAdapter {
+	AireDeDessinSolution aire;
 
-public class Sokoban {
-	public static void main(String[] args) {
-		InputStream in;
-		in = Configuration.charge("Niveaux/Original.txt");
-		Configuration.info("Niveaux trouvés");
+	EcouteurDeSourisSolution(AireDeDessinSolution a) {
+		aire = a;
+	}
 
-		LecteurNiveaux l = new LecteurNiveaux(in);
-		Jeu j = new Jeu(l);
-		InterfaceGraphique.demarrer(j);
+	@Override
+	public void mousePressed(MouseEvent e) {
+		aire.fixePosition(e.getX(), e.getY());
+		aire.repaint();
 	}
 }

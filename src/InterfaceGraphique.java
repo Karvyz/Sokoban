@@ -56,10 +56,12 @@ public class InterfaceGraphique implements Runnable {
 
 	public void run() {
 		frame = new JFrame("Ma fenetre a moi");
-		frame.add(new NiveauGraphique(j));
+		NiveauGraphique niv = new NiveauGraphique(j);
+		niv.addMouseListener(new AdaptateurSouris(j, niv));
+		frame.addKeyListener(new AdaptateurClavier(j, niv, this));
+		frame.add(niv);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(500, 300);
-		//toggleFullscreen();
 		frame.setVisible(true);
 	}
 }

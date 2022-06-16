@@ -34,7 +34,11 @@ public class DemoFenetre implements Runnable {
 		JFrame frame = new JFrame("Ma fenetre a moi");
 
 		// Ajout de notre composant de dessin dans la fenetre
-		frame.add(new AireDeDessin());
+		AireDeDessin aire = new AireDeDessin();
+		frame.add(aire);
+
+		// Ecoute des évènements liés à la souris dans l'AireDeDessin
+		aire.addMouseListener(new EcouteurDeSouris());
 
 		// Un clic sur le bouton de fermeture clos l'application
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

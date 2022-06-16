@@ -35,6 +35,8 @@ import java.io.InputStream;
 public class NiveauGraphique extends JComponent {
 	Image pousseur, mur, sol, caisse, but, caisseSurBut;
 	Jeu j;
+	int largeurCase;
+	int hauteurCase;
 
 	NiveauGraphique(Jeu jeu) {
 		j = jeu;
@@ -68,8 +70,8 @@ public class NiveauGraphique extends JComponent {
 
 		int largeur = getSize().width;
 		int hauteur = getSize().height;
-		int largeurCase = largeur / n.colonnes();
-		int hauteurCase = hauteur / n.lignes();
+		largeurCase = largeur / n.colonnes();
+		hauteurCase = hauteur / n.lignes();
 		// On prend des cases carrées
 		largeurCase = Math.min(largeurCase, hauteurCase);
 		hauteurCase = largeurCase;
@@ -94,5 +96,13 @@ public class NiveauGraphique extends JComponent {
 					else
 						tracer(drawable, caisse, x, y, largeurCase, hauteurCase);
 			}
+	}
+
+	int hauteurCase() {
+		return hauteurCase;
+	}
+
+	int largeurCase() {
+		return largeurCase;
 	}
 }

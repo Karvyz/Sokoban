@@ -25,18 +25,33 @@
  *          38401 Saint Martin d'Hères
  */
 
-import Global.Configuration;
+import javax.swing.*;
 
-import java.io.InputStream;
+// L'interface runnable déclare une méthode run
+public class DemoFenetreSolution implements Runnable {
+	public void run() {
+		// Creation d'une fenetre
+		JFrame frame = new JFrame("Ma fenetre a moi");
 
-public class Sokoban {
+		// Ajout de notre composant de dessin dans la fenetre
+		AireDeDessinSolution aire = new AireDeDessinSolution();
+		frame.add(aire);
+
+		// Ecoute des évènements liés à la souris dans l'AireDeDessin
+		aire.addMouseListener(new EcouteurDeSourisSolution(aire));
+
+		// Un clic sur le bouton de fermeture clos l'application
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		// On fixe la taille et on demarre
+		frame.setSize(500, 300);
+		frame.setVisible(true);
+	}
+
 	public static void main(String[] args) {
-		InputStream in;
-		in = Configuration.charge("Niveaux/Original.txt");
-		Configuration.info("Niveaux trouvés");
-
-		LecteurNiveaux l = new LecteurNiveaux(in);
-		Jeu j = new Jeu(l);
-		InterfaceGraphique.demarrer(j);
+		// Swing s'exécute dans un thread séparé. En aucun cas il ne faut accéder directement
+		// aux composants graphiques depuis le thread principal. Swing fournit la méthode
+		// invokeLater pour demander au thread de Swing d'exécuter la méthode run d'un Runnable.
+		SwingUtilities.invokeLater(new DemoFenetreSolution());
 	}
 }

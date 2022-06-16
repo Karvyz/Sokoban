@@ -25,18 +25,47 @@
  *          38401 Saint Martin d'Hères
  */
 
-import Global.Configuration;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
-import java.io.InputStream;
+public class AdaptateurClavier extends KeyAdapter {
+	Jeu j;
+	NiveauGraphique n;
+	InterfaceGraphique f;
 
-public class Sokoban {
-	public static void main(String[] args) {
-		InputStream in;
-		in = Configuration.charge("Niveaux/Original.txt");
-		Configuration.info("Niveaux trouvés");
+	AdaptateurClavier(Jeu jeu, NiveauGraphique niv, InterfaceGraphique fen) {
+		j = jeu;
+		n = niv;
+		f = fen;
+	}
 
-		LecteurNiveaux l = new LecteurNiveaux(in);
-		Jeu j = new Jeu(l);
-		InterfaceGraphique.demarrer(j);
+	void deplace(int dl, int dc) {
+		j.deplace(dl, dc);
+		n.repaint();
+	}
+
+	@Override
+	public void keyPressed(KeyEvent event) {
+		switch (event.getKeyCode()) {
+			case KeyEvent.VK_LEFT:
+				deplace(0, -1);
+				break;
+			case KeyEvent.VK_RIGHT:
+				deplace(0, 1);
+				break;
+			case KeyEvent.VK_UP:
+				deplace(-1, 0);
+				break;
+			case KeyEvent.VK_DOWN:
+				deplace(1, 0);
+				break;
+			case KeyEvent.VK_Q:
+			case KeyEvent.VK_A:
+				System.exit(0);
+				break;
+			case KeyEvent.VK_ESCAPE:
+				f.toggleFullscreen();
+				break;
+		}
 	}
 }

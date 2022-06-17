@@ -1,3 +1,4 @@
+package Vue;
 /*
  * Sokoban - Encore une nouvelle version (à but pédagogique) du célèbre jeu
  * Copyright (C) 2018 Guillaume Huard
@@ -26,13 +27,16 @@
  */
 
 import Global.Configuration;
+import Modele.Jeu;
+import Modele.Niveau;
+import Patterns.Observateur;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.InputStream;
 
-public class NiveauGraphique extends JComponent {
+public class NiveauGraphique extends JComponent implements Observateur {
 	Image pousseur, mur, sol, caisse, but, caisseSurBut;
 	Jeu j;
 	int largeurCase;
@@ -40,6 +44,7 @@ public class NiveauGraphique extends JComponent {
 
 	NiveauGraphique(Jeu jeu) {
 		j = jeu;
+		j.ajouteObservateur(this);
 		pousseur = lisImage("Pousseur");
 		mur = lisImage("Mur");
 		sol = lisImage("Sol");
@@ -104,5 +109,10 @@ public class NiveauGraphique extends JComponent {
 
 	int largeurCase() {
 		return largeurCase;
+	}
+
+	@Override
+	public void miseAJour() {
+		repaint();
 	}
 }

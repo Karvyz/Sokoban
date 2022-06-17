@@ -1,3 +1,4 @@
+package Vue;
 /*
  * Sokoban - Encore une nouvelle version (à but pédagogique) du célèbre jeu
  * Copyright (C) 2018 Guillaume Huard
@@ -24,37 +25,8 @@
  *          Domaine universitaire
  *          38401 Saint Martin d'Hères
  */
-
-import Controleur.ControleurMediateur;
-import Global.Configuration;
-import Modele.Jeu;
-import Modele.LecteurNiveaux;
-import Vue.CollecteurEvenements;
-import Vue.InterfaceGraphique;
-import Vue.InterfaceTextuelle;
-
-import java.io.InputStream;
-
-public class Sokoban {
-	final static String typeInterface = "Graphique";
-
-	public static void main(String[] args) {
-		InputStream in;
-		in = Configuration.ouvre("Niveaux/Original.txt");
-		Configuration.info("Niveaux trouvés");
-
-		LecteurNiveaux l = new LecteurNiveaux(in);
-		Jeu j = new Jeu(l);
-		CollecteurEvenements control = new ControleurMediateur(j);
-		switch (typeInterface) {
-			case "Graphique":
-				InterfaceGraphique.demarrer(j, control);
-				break;
-			case "Textuelle":
-				InterfaceTextuelle.demarrer(j, control);
-				break;
-			default:
-				Configuration.erreur("Interface inconnue");
-		}
-	}
+public interface CollecteurEvenements {
+	void clicSouris(int l, int c);
+	void toucheClavier(String t);
+	void ajouteInterfaceUtilisateur(InterfaceUtilisateur vue);
 }

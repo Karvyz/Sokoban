@@ -1,3 +1,4 @@
+package Vue;
 /*
  * Sokoban - Encore une nouvelle version (à but pédagogique) du célèbre jeu
  * Copyright (C) 2018 Guillaume Huard
@@ -25,21 +26,27 @@
  *          38401 Saint Martin d'Hères
  */
 
+import Modele.Jeu;
+
 import javax.swing.*;
 import java.awt.*;
 
 // L'interface runnable déclare une méthode run
-public class InterfaceGraphique implements Runnable {
+public class InterfaceGraphique implements Runnable, InterfaceUtilisateur {
 	Jeu j;
+	CollecteurEvenements control;
 	JFrame frame;
 	boolean maximized;
 
-	InterfaceGraphique(Jeu jeu) {
+	InterfaceGraphique(Jeu jeu, CollecteurEvenements c) {
 		j = jeu;
+		control = c;
 	}
 
-	static void demarrer(Jeu j) {
-		SwingUtilities.invokeLater(new InterfaceGraphique(j));
+	public static void demarrer(Jeu j, CollecteurEvenements c) {
+		InterfaceGraphique vue = new InterfaceGraphique(j, c);
+		c.ajouteInterfaceUtilisateur(vue);
+		SwingUtilities.invokeLater(vue);
 	}
 
 	public void toggleFullscreen() {
@@ -57,8 +64,8 @@ public class InterfaceGraphique implements Runnable {
 	public void run() {
 		frame = new JFrame("Ma fenetre a moi");
 		NiveauGraphique niv = new NiveauGraphique(j);
-		niv.addMouseListener(new AdaptateurSouris(j, niv));
-		frame.addKeyListener(new AdaptateurClavier(j, niv, this));
+		niv.addMouseListener(new AdaptateurSouris(niv, control));
+		frame.addKeyListener(new AdaptateurClavier(control));
 		frame.add(niv);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(500, 300);

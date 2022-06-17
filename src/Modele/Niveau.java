@@ -1,4 +1,4 @@
-
+package Modele;
 /*
  * Sokoban - Encore une nouvelle version (à but pédagogique) du célèbre jeu
  * Copyright (C) 2018 Guillaume Huard
@@ -26,7 +26,7 @@
  *          38401 Saint Martin d'Hères
  */
 
-class Niveau {
+public class Niveau {
 	static final int VIDE = 0;
 	static final int MUR = 1;
 	static final int POUSSEUR = 2;
@@ -146,11 +146,11 @@ class Niveau {
 		ajoute(BUT, i, j);
 	}
 
-	int lignes() {
+	public int lignes() {
 		return l;
 	}
 
-	int colonnes() {
+	public int colonnes() {
 		return c;
 	}
 
@@ -162,19 +162,19 @@ class Niveau {
 		return cases[l][c] == VIDE;
 	}
 
-	boolean aMur(int l, int c) {
+	public boolean aMur(int l, int c) {
 		return (cases[l][c] & MUR) != 0;
 	}
 
-	boolean aBut(int l, int c) {
+	public boolean aBut(int l, int c) {
 		return (cases[l][c] & BUT) != 0;
 	}
 
-	boolean aPousseur(int l, int c) {
+	public boolean aPousseur(int l, int c) {
 		return (cases[l][c] & POUSSEUR) != 0;
 	}
 
-	boolean aCaisse(int l, int c) {
+	public boolean aCaisse(int l, int c) {
 		return (cases[l][c] & CAISSE) != 0;
 	}
 

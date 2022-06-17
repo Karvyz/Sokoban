@@ -1,3 +1,4 @@
+package Vue;
 /*
  * Sokoban - Encore une nouvelle version (à but pédagogique) du célèbre jeu
  * Copyright (C) 2018 Guillaume Huard
@@ -25,30 +26,38 @@
  *          38401 Saint Martin d'Hères
  */
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
-public class AdaptateurSouris extends MouseAdapter {
-	Jeu j;
-	NiveauGraphique n;
+public class AdaptateurClavier extends KeyAdapter {
+	CollecteurEvenements control;
 
-	AdaptateurSouris(Jeu jeu, NiveauGraphique niv) {
-		j = jeu;
-		n = niv;
+	AdaptateurClavier(CollecteurEvenements c) {
+		control = c;
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
-		int l = e.getY() / n.hauteurCase();
-		int c = e.getX() / n.largeurCase();
-
-		int dL = l - j.lignePousseur();
-		int dC = c - j.colonnePousseur();
-		int sum = dC + dL;
-		sum = sum * sum;
-		if ((dC * dL == 0) && (sum == 1)) {
-			j.deplace(dL, dC);
-			n.repaint();
+	public void keyPressed(KeyEvent event) {
+		switch (event.getKeyCode()) {
+			case KeyEvent.VK_LEFT:
+				control.toucheClavier("Left");
+				break;
+			case KeyEvent.VK_RIGHT:
+				control.toucheClavier("Right");
+				break;
+			case KeyEvent.VK_UP:
+				control.toucheClavier("Up");
+				break;
+			case KeyEvent.VK_DOWN:
+				control.toucheClavier("Down");
+				break;
+			case KeyEvent.VK_Q:
+			case KeyEvent.VK_A:
+				control.toucheClavier("Quit");
+				break;
+			case KeyEvent.VK_ESCAPE:
+				control.toucheClavier("Full");
+				break;
 		}
 	}
 }

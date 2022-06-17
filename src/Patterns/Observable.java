@@ -1,3 +1,4 @@
+package Patterns;
 /*
  * Sokoban - Encore une nouvelle version (à but pédagogique) du célèbre jeu
  * Copyright (C) 2018 Guillaume Huard
@@ -24,41 +25,34 @@
  *          Domaine universitaire
  *          38401 Saint Martin d'Hères
  */
-public class Jeu {
-	Niveau n;
-	LecteurNiveaux l;
 
-	Jeu(LecteurNiveaux lect) {
-		l = lect;
-		prochainNiveau();
+/*
+ * Pattern Observateur tel que présenté dans le livre de Gamma et Al.
+ * Ce pattern existe déjà dans la bibliothèque standard de Java sous une forme
+ * légèrement différente. Il est réimplémenté ici à des fins pédagogiques
+ */
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+public class Observable {
+	List<Observateur> observateurs;
+
+	public Observable() {
+		observateurs = new ArrayList<>();
 	}
 
-	public Niveau niveau() {
-		return n;
+	public void ajouteObservateur(Observateur o) {
+		observateurs.add(o);
 	}
 
-	public boolean deplace(int x, int y) {
-		boolean resultat = n.deplace(x, y);
-		if (n.estTermine())
-			prochainNiveau();
-		return resultat;
-	}
+	public void metAJour() {
+		Iterator<Observateur> it;
 
-	private void prochainNiveau() {
-		Niveau nouveau = l.lisProchainNiveau();
-		if (nouveau != null) {
-			n = nouveau;
-		} else {
-			System.exit(0);
+		it = observateurs.iterator();
+		while (it.hasNext()) {
+			Observateur o = it.next();
+			o.miseAJour();
 		}
-	}
-
-
-	public int lignePousseur() {
-		return n.lignePousseur();
-	}
-
-	public int colonnePousseur() {
-		return n.colonnePousseur();
 	}
 }

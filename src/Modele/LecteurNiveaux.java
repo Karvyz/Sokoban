@@ -1,3 +1,4 @@
+package Modele;
 /*
  * Sokoban - Encore une nouvelle version (à but pédagogique) du célèbre jeu
  * Copyright (C) 2018 Guillaume Huard
@@ -32,7 +33,7 @@ public class LecteurNiveaux {
 	Scanner s;
 	Niveau n;
 
-	LecteurNiveaux(InputStream in) {
+	public LecteurNiveaux(InputStream in) {
 		s = new Scanner(in);
 	}
 

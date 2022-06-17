@@ -1,3 +1,4 @@
+package Vue;
 /*
  * Sokoban - Encore une nouvelle version (à but pédagogique) du célèbre jeu
  * Copyright (C) 2018 Guillaume Huard
@@ -25,20 +26,42 @@
  *          38401 Saint Martin d'Hères
  */
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import Modele.Jeu;
+import Modele.RedacteurNiveau;
+import Patterns.Observateur;
 
-public class EcouteurDeSourisSolution extends MouseAdapter {
-	AireDeDessinSolution aire;
+import java.util.Scanner;
 
-	EcouteurDeSourisSolution(AireDeDessinSolution a) {
-		aire = a;
+// Interface textuelle permettant de mettre en évidence la modularité de la vue
+public class InterfaceTextuelle implements InterfaceUtilisateur, Observateur {
+	Jeu j;
+	CollecteurEvenements control;
+	RedacteurNiveau affichage;
+
+	InterfaceTextuelle(Jeu jeu, CollecteurEvenements c) {
+		j = jeu;
+		control = c;
+		j.ajouteObservateur(this);
+		affichage = new RedacteurNiveau(System.out);
+	}
+
+	public static void demarrer(Jeu j, CollecteurEvenements c) {
+		InterfaceTextuelle vue = new InterfaceTextuelle(j, c);
+		c.ajouteInterfaceUtilisateur(vue);
+		vue.miseAJour();
+		Scanner s = new Scanner(System.in);
+		while (true) {
+			System.out.print("Commande > ");
+			c.toucheClavier(s.next());
+		}
+	}
+
+	public void toggleFullscreen() {
+		System.out.println("Pas de plein écran en mode textuel");
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
-		aire.fixePosition(e.getX(), e.getY());
-		aire.repaint();
+	public void miseAJour() {
+		affichage.ecrisNiveau(j.niveau());
 	}
 }

@@ -1,3 +1,4 @@
+package Controleur;
 /*
  * Sokoban - Encore une nouvelle version (à but pédagogique) du célèbre jeu
  * Copyright (C) 2018 Guillaume Huard
@@ -25,36 +26,60 @@
  *          38401 Saint Martin d'Hères
  */
 
-import Controleur.ControleurMediateur;
-import Global.Configuration;
 import Modele.Jeu;
-import Modele.LecteurNiveaux;
 import Vue.CollecteurEvenements;
-import Vue.InterfaceGraphique;
-import Vue.InterfaceTextuelle;
+import Vue.InterfaceUtilisateur;
 
-import java.io.InputStream;
+public class ControleurMediateur implements CollecteurEvenements {
+	Jeu jeu;
+	InterfaceUtilisateur vue;
 
-public class Sokoban {
-	final static String typeInterface = "Graphique";
+	public ControleurMediateur(Jeu j) {
+		jeu = j;
+	}
 
-	public static void main(String[] args) {
-		InputStream in;
-		in = Configuration.ouvre("Niveaux/Original.txt");
-		Configuration.info("Niveaux trouvés");
+	@Override
+	public void clicSouris(int l, int c) {
+		int dL = l - jeu.lignePousseur();
+		int dC = c - jeu.colonnePousseur();
+		int sum = dC + dL;
+		sum = sum * sum;
+		if ((dC * dL == 0) && (sum == 1))
+			deplace(dL, dC);
+	}
 
-		LecteurNiveaux l = new LecteurNiveaux(in);
-		Jeu j = new Jeu(l);
-		CollecteurEvenements control = new ControleurMediateur(j);
-		switch (typeInterface) {
-			case "Graphique":
-				InterfaceGraphique.demarrer(j, control);
+	void deplace(int dL, int dC) {
+		if (jeu.deplace(dL, dC) && jeu.estTermine())
+			System.exit(0);
+	}
+
+	@Override
+	public void toucheClavier(String touche) {
+		switch (touche) {
+			case "Left":
+				deplace(0, -1);
 				break;
-			case "Textuelle":
-				InterfaceTextuelle.demarrer(j, control);
+			case "Right":
+				deplace(0, 1);
+				break;
+			case "Up":
+				deplace(-1, 0);
+				break;
+			case "Down":
+				deplace(1, 0);
+				break;
+			case "Quit":
+				System.exit(0);
+				break;
+			case "Full":
+				vue.toggleFullscreen();
 				break;
 			default:
-				Configuration.erreur("Interface inconnue");
+				System.out.println("Touche inconnue : " + touche);
 		}
+	}
+
+	public void ajouteInterfaceUtilisateur(InterfaceUtilisateur v) {
+		vue = v;
 	}
 }

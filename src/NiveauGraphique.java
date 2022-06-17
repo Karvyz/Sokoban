@@ -49,7 +49,7 @@ public class NiveauGraphique extends JComponent {
 	}
 
 	private Image lisImage(String nom) {
-		InputStream in = Configuration.charge("Images/" + nom + ".png");
+		InputStream in = Configuration.ouvre("Images/" + nom + ".png");
 		Configuration.info("Chargement de l'image " + nom);
 		try {
 			// Chargement d'une image utilisable dans Swing

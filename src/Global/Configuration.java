@@ -34,7 +34,7 @@ import java.io.InputStream;
 public class Configuration {
 	static final int silence = 1;
 
-	public static InputStream charge(String s) {
+	public static InputStream ouvre(String s) {
 		InputStream in = null;
 		try {
 			in = new FileInputStream("res/" + s);

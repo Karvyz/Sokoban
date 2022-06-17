@@ -32,7 +32,7 @@ import java.io.InputStream;
 public class Sokoban {
 	public static void main(String[] args) {
 		InputStream in;
-		in = Configuration.charge("Niveaux/Original.txt");
+		in = Configuration.ouvre("Niveaux/Original.txt");
 		Configuration.info("Niveaux trouvés");
 
 		LecteurNiveaux l = new LecteurNiveaux(in);

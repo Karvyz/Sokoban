@@ -60,6 +60,14 @@ public class InterfaceTextuelle implements InterfaceUtilisateur, Observateur {
 		System.out.println("Pas de plein écran en mode textuel");
 	}
 
+	// On ignore simplement les animations et la direction du pousseur en mode textuel
+	@Override
+	public void changeEtape() { }
+	@Override
+	public void metAJourDirection(int dL, int dC) { }
+	@Override
+	public void decale(int versL, int versC, double dL, double dC) { }
+
 	@Override
 	public void miseAJour() {
 		affichage.ecrisNiveau(j.niveau());

@@ -26,16 +26,35 @@ package Controleur;
  *          38401 Saint Martin d'Hères
  */
 
+import Global.Configuration;
+import Modele.Coup;
 import Modele.Jeu;
+import Structures.Iterateur;
+import Structures.Sequence;
 import Vue.CollecteurEvenements;
 import Vue.InterfaceUtilisateur;
 
 public class ControleurMediateur implements CollecteurEvenements {
 	Jeu jeu;
 	InterfaceUtilisateur vue;
+	Sequence<Animation> animations;
+	double vitesseAnimations;
+	int lenteurPas;
+	Animation mouvement;
+	boolean animationsSupportees, animationsActives;
 
 	public ControleurMediateur(Jeu j) {
 		jeu = j;
+
+		animations = Configuration.nouvelleSequence();
+		vitesseAnimations = Configuration.vitesseAnimations;
+		lenteurPas = Configuration.lenteurPas;
+		animations.insereTete(new AnimationPousseur(lenteurPas, this));
+		mouvement = null;
+		// Tant qu'on ne reçoit pas d'évènement temporel, on n'est pas sur que les
+		// animations soient supportées (ex. interface textuelle)
+		animationsSupportees = false;
+		animationsActives = false;
 	}
 
 	@Override
@@ -49,9 +68,27 @@ public class ControleurMediateur implements CollecteurEvenements {
 	}
 
 	void deplace(int dL, int dC) {
-		if (jeu.deplace(dL, dC) && jeu.estTermine())
-			System.exit(0);
+		if (mouvement == null) {
+			Coup cp = jeu.deplace(dL, dC);
+			if (cp != null) {
+				vue.metAJourDirection(dL, dC);
+				if (animationsActives) {
+					mouvement = new AnimationCoup(cp, vitesseAnimations, this);
+					animations.insereQueue(mouvement);
+				} else
+					testFin();
+			}
+		}
 	}
+
+	private void testFin() {
+		if (jeu.niveauTermine()) {
+			jeu.prochainNiveau();
+			if (jeu.jeuTermine())
+				System.exit(0);
+		}
+	}
+
 
 	@Override
 	public void toucheClavier(String touche) {
@@ -71,6 +108,9 @@ public class ControleurMediateur implements CollecteurEvenements {
 			case "Quit":
 				System.exit(0);
 				break;
+			case "Pause":
+				basculeAnimations();
+				break;
 			case "Full":
 				vue.toggleFullscreen();
 				break;
@@ -81,5 +121,41 @@ public class ControleurMediateur implements CollecteurEvenements {
 
 	public void ajouteInterfaceUtilisateur(InterfaceUtilisateur v) {
 		vue = v;
+	}
+
+	@Override
+	public void tictac() {
+		// On sait qu'on supporte les animations si on reçoit des évènements temporels
+		if (!animationsSupportees) {
+			animationsSupportees = true;
+			animationsActives = Configuration.animations;
+		}
+		if (animationsActives) {
+			Iterateur<Animation> it = animations.iterateur();
+			while (it.aProchain()) {
+				Animation a = it.prochain();
+				a.tictac();
+				if (a.estTerminee()) {
+					if (a == mouvement) {
+						testFin();
+						mouvement = null;
+					}
+					it.supprime();
+				}
+			}
+		}
+	}
+
+	public void changeEtape() {
+		vue.changeEtape();
+	}
+
+	public void decale(int versL, int versC, double dL, double dC) {
+		vue.decale(versL, versC, dL, dC);
+	}
+
+	public void basculeAnimations() {
+		if (animationsSupportees && (mouvement == null))
+			animationsActives = !animationsActives;
 	}
 }

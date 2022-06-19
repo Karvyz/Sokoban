@@ -41,19 +41,21 @@ public class Jeu extends Observable {
 		return n;
 	}
 
-	public boolean deplace(int x, int y) {
-		boolean resultat = n.deplace(x, y);
-		if (n.estTermine())
-			prochainNiveau();
+	public Coup deplace(int x, int y) {
+		Coup resultat = n.deplace(x, y);
 		metAJour();
 		return resultat;
 	}
 
-	private void prochainNiveau() {
+	public void prochainNiveau() {
 		n = l.lisProchainNiveau();
 	}
 
-	public boolean estTermine() {
+	public boolean niveauTermine() {
+		return n.estTermine();
+	}
+
+	public boolean jeuTermine() {
 		return n == null;
 	}
 

@@ -107,27 +107,30 @@ public class Niveau {
 		cases[i][j] = resultat;
 	}
 
-	boolean deplace(int dLig, int dCol) {
+	public Coup deplace(int dLig, int dCol) {
 		int destL = pousseurL + dLig;
 		int destC = pousseurC + dCol;
+		Coup resultat = new Coup();
 
 		if (aCaisse(destL, destC)) {
 			int dCaisL = destL + dLig;
 			int dCaisC = destC + dCol;
 
 			if (!aMur(dCaisL, dCaisC) && !aCaisse(dCaisL, dCaisC)) {
+				resultat.ajouteDeplacement(destL, destC, dCaisL, dCaisC);
 				supprime(CAISSE, destL, destC);
 				ajoute(CAISSE, dCaisL, dCaisC);
 			} else {
-				return false;
+				return null;
 			}
 		}
 		if (!aMur(destL, destC)) {
+			resultat.ajouteDeplacement(pousseurL, pousseurC, destL, destC);
 			supprime(POUSSEUR, pousseurL, pousseurC);
 			ajoute(POUSSEUR, destL, destC);
-			return true;
+			return resultat;
 		}
-		return false;
+		return null;
 	}
 
 	void ajouteMur(int i, int j) {

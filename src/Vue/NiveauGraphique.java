@@ -41,6 +41,11 @@ public class NiveauGraphique extends JComponent implements Observateur {
 	Jeu j;
 	int largeurCase;
 	int hauteurCase;
+	// Décalage des éléments (pour pouvoir les animer)
+	Vecteur [][] decalages;
+	// Images du pousseur (pour l'animation)
+	Image [][] pousseurs;
+	int direction, etape;
 
 	NiveauGraphique(Jeu jeu) {
 		j = jeu;
@@ -51,6 +56,14 @@ public class NiveauGraphique extends JComponent implements Observateur {
 		caisse = lisImage("Caisse");
 		but = lisImage("But");
 		caisseSurBut = lisImage("Caisse_sur_but");
+
+		pousseurs = new Image[4][4];
+		for (int d = 0; d < pousseurs.length; d++)
+			for (int i = 0; i < pousseurs[d].length; i++)
+				pousseurs[d][i] = lisImage("Pousseur_" + d + "_" + i);
+		etape = 0;
+		direction = 2;
+		metAJourPousseur();
 	}
 
 	private Image lisImage(String nom) {
@@ -81,6 +94,14 @@ public class NiveauGraphique extends JComponent implements Observateur {
 		largeurCase = Math.min(largeurCase, hauteurCase);
 		hauteurCase = largeurCase;
 
+		// Le vecteur de décalages doit être conforme au niveau
+		if ((decalages == null)
+				|| (decalages.length != n.lignes())
+				|| (decalages[0].length != n.colonnes()))
+			decalages = new Vecteur[n.lignes()][n.colonnes()];
+
+		// Tracé du niveau
+		// En deux étapes à cause des décalages possibles
 		for (int ligne = 0; ligne < n.lignes(); ligne++)
 			for (int colonne = 0; colonne < n.colonnes(); colonne++) {
 				int x = colonne * largeurCase;
@@ -90,6 +111,17 @@ public class NiveauGraphique extends JComponent implements Observateur {
 					tracer(drawable, but, x, y, largeurCase, hauteurCase);
 				else
 					tracer(drawable, sol, x, y, largeurCase, hauteurCase);
+			}
+		for (int ligne = 0; ligne < n.lignes(); ligne++)
+			for (int colonne = 0; colonne < n.colonnes(); colonne++) {
+				int x = colonne * largeurCase;
+				int y = ligne * hauteurCase;
+				// Décalage éventuel
+				Vecteur decal = decalages[ligne][colonne];
+				if (decal != null) {
+					x += decal.x * largeurCase;
+					y += decal.y * hauteurCase;
+				}
 				// Tracé des objets
 				if (n.aMur(ligne, colonne))
 					tracer(drawable, mur, x, y, largeurCase, hauteurCase);
@@ -114,5 +146,51 @@ public class NiveauGraphique extends JComponent implements Observateur {
 	@Override
 	public void miseAJour() {
 		repaint();
+	}
+
+	public void decale(int l, int c, double dl, double dc) {
+		if ((dl != 0) || (dc != 0)) {
+			Vecteur v = decalages[l][c];
+			if (v == null) {
+				v = new Vecteur();
+				decalages[l][c] = v;
+			}
+			v.x = dc;
+			v.y = dl;
+		} else {
+			decalages[l][c] = null;
+		}
+		miseAJour();
+	}
+
+	// Animation du pousseur
+	void metAJourPousseur() {
+		pousseur = pousseurs[direction][etape];
+	}
+
+	public void metAJourDirection(int dL, int dC) {
+		switch (dL + 2 * dC) {
+			case -2:
+				direction = 1;
+				break;
+			case -1:
+				direction = 0;
+				break;
+			case 1:
+				direction = 2;
+				break;
+			case 2:
+				direction = 3;
+				break;
+			default:
+				Configuration.erreur("Bug interne, direction invalide");
+		}
+		metAJourPousseur();
+	}
+
+	public void changeEtape() {
+		etape = (etape + 1) % pousseurs[direction].length;
+		metAJourPousseur();
+		miseAJour();
 	}
 }

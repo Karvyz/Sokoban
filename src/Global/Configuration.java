@@ -26,12 +26,20 @@ package Global;
  *          38401 Saint Martin d'Hères
  */
 
+import Structures.Sequence;
+import Structures.SequenceListe;
+import Structures.SequenceTableau;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 public class Configuration {
 	static final int silence = 1;
+	static final String typeSequences = "Liste";
+	public static final double vitesseAnimations = 0.15;
+	public static final int lenteurPas = 15;
+	public static final boolean animations = true;
 
 	public static InputStream ouvre(String s) {
 		InputStream in = null;
@@ -55,5 +63,17 @@ public class Configuration {
 	public static void erreur(String s) {
 		affiche(3, "ERREUR : " + s);
 		System.exit(1);
+	}
+
+	public static <E> Sequence<E> nouvelleSequence() {
+		switch (typeSequences) {
+			case "Liste" :
+				return new SequenceListe<>();
+			case "Tableau" :
+				return new SequenceTableau<>();
+			default:
+				erreur("Type de séquence invalide : " + typeSequences);
+				return null;
+		}
 	}
 }

@@ -1,4 +1,3 @@
-package Modele;
 /*
  * Sokoban - Encore une nouvelle version (à but pédagogique) du célèbre jeu
  * Copyright (C) 2018 Guillaume Huard
@@ -25,42 +24,15 @@ package Modele;
  *          Domaine universitaire
  *          38401 Saint Martin d'Hères
  */
+package Controleur;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
-
-public class RedacteurNiveau {
-	PrintStream sortie;
-
-	public RedacteurNiveau(OutputStream out) {
-		sortie = new PrintStream(out);
+class AnimationPousseur extends Animation {
+	AnimationPousseur(int lenteur, ControleurMediateur control) {
+		super(lenteur, control);
 	}
 
-	public void ecrisNiveau(Niveau n) {
-		for (int i = 0; i < n.lignes(); i++) {
-			int dernier = 0;
-			for (int j = 0; j < n.colonnes(); j++)
-				if (!n.estVide(i, j))
-					dernier = j;
-			for (int j = 0; j <= dernier; j++)
-				if (n.aMur(i, j))
-					sortie.print('#');
-				else if (n.aBut(i, j))
-					if (n.aPousseur(i, j))
-						sortie.print('+');
-					else if (n.aCaisse(i, j))
-						sortie.print('*');
-					else
-						sortie.print('.');
-				else if (n.aPousseur(i, j))
-					sortie.print('@');
-				else if (n.aCaisse(i, j))
-					sortie.print('$');
-				else
-					sortie.print(' ');
-			sortie.println();
-		}
-		if (n.nom() != null)
-			sortie.println("; " + n.nom());
+	@Override
+	public void miseAJour() {
+		control.changeEtape();
 	}
 }

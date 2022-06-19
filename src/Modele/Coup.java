@@ -26,41 +26,21 @@ package Modele;
  *          38401 Saint Martin d'Hères
  */
 
-import java.io.OutputStream;
-import java.io.PrintStream;
+import Global.Configuration;
+import Structures.Sequence;
 
-public class RedacteurNiveau {
-	PrintStream sortie;
+public class Coup {
+	Sequence<Mouvement> mouvements;
 
-	public RedacteurNiveau(OutputStream out) {
-		sortie = new PrintStream(out);
+	public Coup() {
+		mouvements = Configuration.nouvelleSequence();
 	}
 
-	public void ecrisNiveau(Niveau n) {
-		for (int i = 0; i < n.lignes(); i++) {
-			int dernier = 0;
-			for (int j = 0; j < n.colonnes(); j++)
-				if (!n.estVide(i, j))
-					dernier = j;
-			for (int j = 0; j <= dernier; j++)
-				if (n.aMur(i, j))
-					sortie.print('#');
-				else if (n.aBut(i, j))
-					if (n.aPousseur(i, j))
-						sortie.print('+');
-					else if (n.aCaisse(i, j))
-						sortie.print('*');
-					else
-						sortie.print('.');
-				else if (n.aPousseur(i, j))
-					sortie.print('@');
-				else if (n.aCaisse(i, j))
-					sortie.print('$');
-				else
-					sortie.print(' ');
-			sortie.println();
-		}
-		if (n.nom() != null)
-			sortie.println("; " + n.nom());
+	public void ajouteDeplacement(int dL, int dC, int vL, int vC) {
+		mouvements.insereQueue(new Mouvement(dL, dC, vL, vC));
+	}
+
+	public Sequence<Mouvement> mouvements() {
+		return mouvements;
 	}
 }

@@ -1,4 +1,3 @@
-package Modele;
 /*
  * Sokoban - Encore une nouvelle version (à but pédagogique) du célèbre jeu
  * Copyright (C) 2018 Guillaume Huard
@@ -25,42 +24,45 @@ package Modele;
  *          Domaine universitaire
  *          38401 Saint Martin d'Hères
  */
+package Controleur;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
+import Modele.Coup;
+import Modele.Mouvement;
+import Structures.Iterateur;
 
-public class RedacteurNiveau {
-	PrintStream sortie;
+public class AnimationCoup extends Animation {
+	double vitesse;
+	Coup coup;
+	double progres;
 
-	public RedacteurNiveau(OutputStream out) {
-		sortie = new PrintStream(out);
+	public AnimationCoup(Coup cp, double v, ControleurMediateur control) {
+		super(1, control);
+		coup = cp;
+		vitesse = v;
+		progres = 0;
+		miseAJour();
 	}
 
-	public void ecrisNiveau(Niveau n) {
-		for (int i = 0; i < n.lignes(); i++) {
-			int dernier = 0;
-			for (int j = 0; j < n.colonnes(); j++)
-				if (!n.estVide(i, j))
-					dernier = j;
-			for (int j = 0; j <= dernier; j++)
-				if (n.aMur(i, j))
-					sortie.print('#');
-				else if (n.aBut(i, j))
-					if (n.aPousseur(i, j))
-						sortie.print('+');
-					else if (n.aCaisse(i, j))
-						sortie.print('*');
-					else
-						sortie.print('.');
-				else if (n.aPousseur(i, j))
-					sortie.print('@');
-				else if (n.aCaisse(i, j))
-					sortie.print('$');
-				else
-					sortie.print(' ');
-			sortie.println();
+	@Override
+	public void miseAJour() {
+		if (!estTerminee()) {
+			progres += vitesse;
+			if (progres > 1)
+				progres = 1;
+			double facteur = progres - 1;
+
+			Iterateur<Mouvement> it = coup.mouvements().iterateur();
+			while (it.aProchain()) {
+				Mouvement m = it.prochain();
+				double dL = (m.versL() - m.depuisL()) * facteur;
+				double dC = (m.versC() - m.depuisC()) * facteur;
+				control.decale(m.versL(), m.versC(), dL, dC);
+			}
 		}
-		if (n.nom() != null)
-			sortie.println("; " + n.nom());
+	}
+
+	@Override
+	public boolean estTerminee() {
+		return progres == 1;
 	}
 }

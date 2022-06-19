@@ -25,8 +25,6 @@
  *          38401 Saint Martin d'Hères
  */
 
-import Global.Configuration;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -36,7 +34,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 class AireDeDessinSolution extends JComponent {
-	String message;
 	int counter;
 	Image img;
 	Point position;

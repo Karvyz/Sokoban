@@ -36,7 +36,7 @@ import Vue.InterfaceTextuelle;
 import java.io.InputStream;
 
 public class Sokoban {
-	final static String typeInterface = "Graphique";
+	final static String typeInterface = Configuration.typeInterface;
 
 	public static void main(String[] args) {
 		InputStream in;

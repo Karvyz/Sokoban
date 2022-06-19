@@ -32,6 +32,7 @@ import java.io.InputStream;
 
 public class Configuration {
 	static final int silence = 1;
+	public static final String typeInterface = "Graphique";
 
 	public static InputStream ouvre(String s) {
 		InputStream in = null;

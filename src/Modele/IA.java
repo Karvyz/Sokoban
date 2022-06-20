@@ -46,6 +46,9 @@ public abstract class IA {
 			case "Teleportations":
 				resultat = new IATeleportations();
 				break;
+			case "ParcoursFixe":
+				resultat = new IAParcoursFixe();
+				break;
 			default:
 				Configuration.erreur("IA de type " + type + " non supportée");
 		}

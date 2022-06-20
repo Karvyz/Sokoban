@@ -26,7 +26,10 @@ package Modele;
  *          38401 Saint Martin d'Hères
  */
 
-public class Niveau {
+import Global.Configuration;
+import Structures.Iterateur;
+
+public class Niveau implements Cloneable {
 	static final int VIDE = 0;
 	static final int MUR = 1;
 	static final int POUSSEUR = 2;
@@ -107,7 +110,36 @@ public class Niveau {
 		cases[i][j] = resultat;
 	}
 
-	public Coup deplace(int dLig, int dCol) {
+	int contenu(int l, int c) {
+		return cases[l][c] & (POUSSEUR | CAISSE);
+	}
+
+	public void jouer(Coup c) {
+		// Le jeu d'un coup se fait en deux temps pour éviter
+		// qu'un déplacement ne vienne écraser un objet existant
+
+		// On récupère tous les objets et on les supprime
+		Iterateur<Mouvement> it = c.mouvements().iterateur();
+		while (it.aProchain()) {
+			Mouvement m = it.prochain();
+			m.fixerContenu(contenu(m.depuisL(), m.depuisC()));
+			supprime(m.contenu(), m.depuisL(), m.depuisC());
+		}
+		// On remet tous les objets à leur nouvelle position
+		it = c.mouvements().iterateur();
+		while (it.aProchain()) {
+			Mouvement m = it.prochain();
+			ajoute(m.contenu(), m.versL(), m.versC());
+		}
+		// On place les marques
+		Iterateur<Marque> it2 = c.marques.iterateur();
+		while (it2.aProchain()) {
+			Marque m = it2.prochain();
+			fixerMarque(m.valeur, m.ligne, m.colonne);
+		}
+	}
+
+	public Coup creerCoup(int dLig, int dCol) {
 		int destL = pousseurL + dLig;
 		int destC = pousseurC + dCol;
 		Coup resultat = new Coup();
@@ -118,19 +150,22 @@ public class Niveau {
 
 			if (!aMur(dCaisL, dCaisC) && !aCaisse(dCaisL, dCaisC)) {
 				resultat.ajouteDeplacement(destL, destC, dCaisL, dCaisC);
-				supprime(CAISSE, destL, destC);
-				ajoute(CAISSE, dCaisL, dCaisC);
 			} else {
 				return null;
 			}
 		}
 		if (!aMur(destL, destC)) {
 			resultat.ajouteDeplacement(pousseurL, pousseurC, destL, destC);
-			supprime(POUSSEUR, pousseurL, pousseurC);
-			ajoute(POUSSEUR, destL, destC);
 			return resultat;
 		}
 		return null;
+	}
+
+	public Coup deplace(int dLig, int dCol) {
+		Coup c = creerCoup(dLig, dCol);
+		if (c != null)
+			jouer(c);
+		return c;
 	}
 
 	void ajouteMur(int i, int j) {
@@ -181,6 +216,10 @@ public class Niveau {
 		return (cases[l][c] & CAISSE) != 0;
 	}
 
+	public boolean estOccupable(int l, int c) {
+		return !aCaisse(l, c) && !aMur(l, c);
+	}
+
 	public boolean estTermine() {
 		return nbCaissesSurBut == nbButs;
 	}
@@ -191,5 +230,34 @@ public class Niveau {
 
 	public int colonnePousseur() {
 		return pousseurC;
+	}
+
+	// Par convention, la méthode clone de java requiert :
+	// - que la classe clonée implémente Cloneable
+	// - que le resultat soit construit avec la méthode clone de la classe parente (pour qu'un clonage
+	//   profond fonctionne sur toute l'ascendence de l'objet)
+	// Le nouvel objet sera de la même classe que l'objet cible du clonage (creation spéciale dans Object)
+	@Override
+	public Niveau clone() {
+		try {
+			Niveau resultat = (Niveau) super.clone();
+			// Le clone de base est un clonage à plat pour le reste il faut
+			// cloner à la main : cela concerne les cases
+			resultat.cases = new int[cases.length][];
+			for (int i=0; i< cases.length; i++)
+				resultat.cases[i] = cases[i].clone();
+			return resultat;
+		} catch (CloneNotSupportedException e) {
+			Configuration.erreur("Bug interne, niveau non clonable");
+		}
+		return null;
+	}
+
+	public int marque(int i, int j) {
+		return (cases[i][j] >> 8) & 0xFFFFFF;
+	}
+
+	public void fixerMarque(int m, int i, int j) {
+		cases[i][j] = (cases[i][j] & 0xFF) | (m << 8);
 	}
 }

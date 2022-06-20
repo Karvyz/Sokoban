@@ -26,47 +26,12 @@ package Modele;
  *          38401 Saint Martin d'Hères
  */
 
-import Patterns.Observable;
+public class Marque {
+	int ligne, colonne, valeur;
 
-public class Jeu extends Observable {
-	Niveau n;
-	LecteurNiveaux l;
-
-	public Jeu(LecteurNiveaux lect) {
-		l = lect;
-		prochainNiveau();
-	}
-
-	public Niveau niveau() {
-		return n;
-	}
-
-	public Coup creerCoup(int x, int y) {
-		return n.creerCoup(x, y);
-	}
-
-	public void jouerCoup(Coup c) {
-		n.jouer(c);
-		metAJour();
-	}
-
-	public void prochainNiveau() {
-		n = l.lisProchainNiveau();
-	}
-
-	public boolean niveauTermine() {
-		return n.estTermine();
-	}
-
-	public boolean jeuTermine() {
-		return n == null;
-	}
-
-	public int lignePousseur() {
-		return n.lignePousseur();
-	}
-
-	public int colonnePousseur() {
-		return n.colonnePousseur();
+	Marque(int l, int c, int val) {
+		ligne = l;
+		colonne = c;
+		valeur = val;
 	}
 }

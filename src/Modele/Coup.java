@@ -31,13 +31,19 @@ import Structures.Sequence;
 
 public class Coup {
 	Sequence<Mouvement> mouvements;
+	Sequence<Marque> marques;
 
 	public Coup() {
 		mouvements = Configuration.nouvelleSequence();
+		marques = Configuration.nouvelleSequence();
 	}
 
 	public void ajouteDeplacement(int dL, int dC, int vL, int vC) {
 		mouvements.insereQueue(new Mouvement(dL, dC, vL, vC));
+	}
+
+	public void ajouteMarque(int l, int c, int val) {
+		marques.insereQueue(new Marque(l, c, val));
 	}
 
 	public Sequence<Mouvement> mouvements() {

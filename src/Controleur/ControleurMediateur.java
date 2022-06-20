@@ -27,8 +27,7 @@ package Controleur;
  */
 
 import Global.Configuration;
-import Modele.Coup;
-import Modele.Jeu;
+import Modele.*;
 import Structures.Iterateur;
 import Structures.Sequence;
 import Vue.CollecteurEvenements;
@@ -42,6 +41,10 @@ public class ControleurMediateur implements CollecteurEvenements {
 	int lenteurPas;
 	Animation mouvement;
 	boolean animationsSupportees, animationsActives;
+	int lenteurJeuAutomatique;
+	IA joueurAutomatique;
+	boolean IAActive;
+	AnimationJeuAutomatique animationIA;
 
 	public ControleurMediateur(Jeu j) {
 		jeu = j;
@@ -67,17 +70,38 @@ public class ControleurMediateur implements CollecteurEvenements {
 			deplace(dL, dC);
 	}
 
+	public void metAJourDirection(Coup c) {
+		// Mise à jour de la direction du pousseur (si le coup est inhabituel,
+		// construit par l'IA, il faut chercher le déplacement du pousseur)
+		Iterateur<Mouvement> it = c.mouvements().iterateur();
+		while (it.aProchain()) {
+			Mouvement m = it.prochain();
+			if ((m.versL() == jeu.lignePousseur()) && (m.versC() == jeu.colonnePousseur())) {
+				int dL = m.versL() - m.depuisL();
+				int dC = m.versC() - m.depuisC();
+				// On ignore les téléportations
+				if (dL*dL + dC*dC == 1)
+					vue.metAJourDirection(dL, dC);
+			}
+		}
+	}
+
+	void joue(Coup cp) {
+		if (cp != null) {
+			jeu.jouerCoup(cp);
+			metAJourDirection(cp);
+			if (animationsActives) {
+				mouvement = new AnimationCoup(cp, vitesseAnimations, this);
+				animations.insereQueue(mouvement);
+			} else
+				testFin();
+		}
+	}
+
 	void deplace(int dL, int dC) {
 		if (mouvement == null) {
-			Coup cp = jeu.deplace(dL, dC);
-			if (cp != null) {
-				vue.metAJourDirection(dL, dC);
-				if (animationsActives) {
-					mouvement = new AnimationCoup(cp, vitesseAnimations, this);
-					animations.insereQueue(mouvement);
-				} else
-					testFin();
-			}
+			Coup cp = jeu.creerCoup(dL, dC);
+			joue(cp);
 		}
 	}
 
@@ -111,6 +135,9 @@ public class ControleurMediateur implements CollecteurEvenements {
 			case "Pause":
 				basculeAnimations();
 				break;
+			case "IA":
+				basculeIA();
+				break;
 			case "Full":
 				vue.toggleFullscreen();
 				break;
@@ -129,6 +156,11 @@ public class ControleurMediateur implements CollecteurEvenements {
 		if (!animationsSupportees) {
 			animationsSupportees = true;
 			animationsActives = Configuration.animations;
+		}
+		// On traite l'IA séparément pour pouvoir l'activer même si les animations
+		// "esthétiques" sont désactivées
+		if (IAActive && (mouvement == null)) {
+			animationIA.tictac();
 		}
 		if (animationsActives) {
 			Iterateur<Animation> it = animations.iterateur();
@@ -157,5 +189,19 @@ public class ControleurMediateur implements CollecteurEvenements {
 	public void basculeAnimations() {
 		if (animationsSupportees && (mouvement == null))
 			animationsActives = !animationsActives;
+	}
+
+	public void basculeIA() {
+		if (animationsSupportees) {
+			if (joueurAutomatique == null) {
+				joueurAutomatique = IA.nouvelle(jeu);
+				if (joueurAutomatique != null) {
+					lenteurJeuAutomatique = Configuration.lenteurJeuAutomatique;
+					animationIA = new AnimationJeuAutomatique(lenteurJeuAutomatique, joueurAutomatique, this);
+				}
+			}
+			if (joueurAutomatique != null)
+				IAActive = !IAActive;
+		}
 	}
 }

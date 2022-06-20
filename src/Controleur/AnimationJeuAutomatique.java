@@ -1,4 +1,3 @@
-package Modele;
 /*
  * Sokoban - Encore une nouvelle version (à but pédagogique) du célèbre jeu
  * Copyright (C) 2018 Guillaume Huard
@@ -25,48 +24,30 @@ package Modele;
  *          Domaine universitaire
  *          38401 Saint Martin d'Hères
  */
+package Controleur;
 
-import Patterns.Observable;
+import Global.Configuration;
+import Modele.Coup;
+import Modele.IA;
+import Structures.Sequence;
 
-public class Jeu extends Observable {
-	Niveau n;
-	LecteurNiveaux l;
+class AnimationJeuAutomatique extends Animation {
+	IA joueur;
+	Sequence<Coup> enAttente;
 
-	public Jeu(LecteurNiveaux lect) {
-		l = lect;
-		prochainNiveau();
+	AnimationJeuAutomatique(int lenteur, IA j, ControleurMediateur c) {
+		super(lenteur, c);
+		joueur = j;
+		control = c;
 	}
 
-	public Niveau niveau() {
-		return n;
-	}
-
-	public Coup creerCoup(int x, int y) {
-		return n.creerCoup(x, y);
-	}
-
-	public void jouerCoup(Coup c) {
-		n.jouer(c);
-		metAJour();
-	}
-
-	public void prochainNiveau() {
-		n = l.lisProchainNiveau();
-	}
-
-	public boolean niveauTermine() {
-		return n.estTermine();
-	}
-
-	public boolean jeuTermine() {
-		return n == null;
-	}
-
-	public int lignePousseur() {
-		return n.lignePousseur();
-	}
-
-	public int colonnePousseur() {
-		return n.colonnePousseur();
+	@Override
+	public void miseAJour() {
+		if ((enAttente == null) || enAttente.estVide())
+			enAttente = joueur.elaboreCoups();
+		if ((enAttente == null) || enAttente.estVide())
+			Configuration.erreur("Bug : l'IA n'a joué aucun coup");
+		else
+			control.joue(enAttente.extraitTete());
 	}
 }

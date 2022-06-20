@@ -106,11 +106,14 @@ public class NiveauGraphique extends JComponent implements Observateur {
 			for (int colonne = 0; colonne < n.colonnes(); colonne++) {
 				int x = colonne * largeurCase;
 				int y = ligne * hauteurCase;
+				int marque = n.marque(ligne, colonne);
 				// Tracé du sol
 				if (n.aBut(ligne, colonne))
 					tracer(drawable, but, x, y, largeurCase, hauteurCase);
 				else
 					tracer(drawable, sol, x, y, largeurCase, hauteurCase);
+				if (marque > 0)
+					tracerCroix(drawable, marque, x, y, largeurCase, hauteurCase);
 			}
 		for (int ligne = 0; ligne < n.lignes(); ligne++)
 			for (int colonne = 0; colonne < n.colonnes(); colonne++) {
@@ -127,12 +130,25 @@ public class NiveauGraphique extends JComponent implements Observateur {
 					tracer(drawable, mur, x, y, largeurCase, hauteurCase);
 				else if (n.aPousseur(ligne, colonne))
 					tracer(drawable, pousseur, x, y, largeurCase, hauteurCase);
-				else if (n.aCaisse(ligne, colonne))
+				else if (n.aCaisse(ligne, colonne)) {
+					int marque = n.marque(ligne, colonne);
 					if (n.aBut(ligne, colonne))
 						tracer(drawable, caisseSurBut, x, y, largeurCase, hauteurCase);
 					else
 						tracer(drawable, caisse, x, y, largeurCase, hauteurCase);
+					if (marque > 0)
+						tracerCroix(drawable, marque, x, y, largeurCase, hauteurCase);
+				}
 			}
+	}
+
+	public void tracerCroix(Graphics2D drawable, int marque, int x, int y, int l, int h) {
+		int s = l/10;
+		drawable.setColor(new Color(marque));
+		drawable.setStroke(new BasicStroke(s));
+		drawable.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		drawable.drawLine(x+s, y+s, x+l-s, y+h-s);
+		drawable.drawLine(x+h-s, y+s, x+s, y+h-s);
 	}
 
 	int hauteurCase() {

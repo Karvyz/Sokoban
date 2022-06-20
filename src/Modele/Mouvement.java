@@ -28,6 +28,7 @@ package Modele;
 
 public class Mouvement {
 	int depuisL, depuisC, versL, versC;
+	int contenu;
 
 	Mouvement(int dL, int dC, int vL, int vC) {
 		depuisL = dL;
@@ -50,5 +51,13 @@ public class Mouvement {
 
 	public int versC() {
 		return versC;
+	}
+
+	public int contenu() {
+		return contenu;
+	}
+
+	void fixerContenu(int c) {
+		contenu = c;
 	}
 }

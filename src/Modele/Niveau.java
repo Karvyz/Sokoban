@@ -110,45 +110,32 @@ public class Niveau implements Cloneable {
 		cases[i][j] = resultat;
 	}
 
-	int contenu(int l, int c) {
-		return cases[l][c] & (POUSSEUR | CAISSE);
+	int contenu(int i, int j) {
+		return cases[i][j] & (POUSSEUR | CAISSE);
 	}
 
-	public void jouer(Coup c) {
-		// Le jeu d'un coup se fait en deux temps pour éviter
-		// qu'un déplacement ne vienne écraser un objet existant
-
-		// On récupère tous les objets et on les supprime
-		Iterateur<Mouvement> it = c.mouvements().iterateur();
-		while (it.aProchain()) {
-			Mouvement m = it.prochain();
-			m.fixerContenu(contenu(m.depuisL(), m.depuisC()));
-			supprime(m.contenu(), m.depuisL(), m.depuisC());
+	boolean appliqueMouvement(Mouvement m) {
+		int contenu = contenu(m.depuisL(), m.depuisC());
+		if (contenu != 0) {
+			if (estOccupable(m.versL(), m.versC())) {
+				supprime(contenu, m.depuisL(), m.depuisC());
+				ajoute(contenu, m.versL(), m.versC());
+				return true;
+			}
 		}
-		// On remet tous les objets à leur nouvelle position
-		it = c.mouvements().iterateur();
-		while (it.aProchain()) {
-			Mouvement m = it.prochain();
-			ajoute(m.contenu(), m.versL(), m.versC());
-		}
-		// On place les marques
-		Iterateur<Marque> it2 = c.marques.iterateur();
-		while (it2.aProchain()) {
-			Marque m = it2.prochain();
-			fixerMarque(m.valeur, m.ligne, m.colonne);
-		}
+		return false;
 	}
 
-	public Coup creerCoup(int dLig, int dCol) {
+	public Coup deplace(int dLig, int dCol) {
 		int destL = pousseurL + dLig;
 		int destC = pousseurC + dCol;
-		Coup resultat = new Coup();
+		Coup resultat = new Coup(this);
 
 		if (aCaisse(destL, destC)) {
 			int dCaisL = destL + dLig;
 			int dCaisC = destC + dCol;
 
-			if (!aMur(dCaisL, dCaisC) && !aCaisse(dCaisL, dCaisC)) {
+			if (estOccupable(dCaisL, dCaisC)) {
 				resultat.ajouteDeplacement(destL, destC, dCaisL, dCaisC);
 			} else {
 				return null;
@@ -159,13 +146,6 @@ public class Niveau implements Cloneable {
 			return resultat;
 		}
 		return null;
-	}
-
-	public Coup deplace(int dLig, int dCol) {
-		Coup c = creerCoup(dLig, dCol);
-		if (c != null)
-			jouer(c);
-		return c;
 	}
 
 	void ajouteMur(int i, int j) {
@@ -217,7 +197,7 @@ public class Niveau implements Cloneable {
 	}
 
 	public boolean estOccupable(int l, int c) {
-		return !aCaisse(l, c) && !aMur(l, c);
+		return (cases[l][c] & (MUR | CAISSE | POUSSEUR)) == 0;
 	}
 
 	public boolean estTermine() {

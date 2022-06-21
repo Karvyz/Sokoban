@@ -31,13 +31,19 @@ import Structures.Sequence;
 
 public class Coup {
 	Sequence<Mouvement> mouvements;
+	Niveau niv;
 
-	public Coup() {
+	public Coup(Niveau n) {
+		niv = n;
 		mouvements = Configuration.nouvelleSequence();
 	}
 
 	public void ajouteDeplacement(int dL, int dC, int vL, int vC) {
-		mouvements.insereQueue(new Mouvement(dL, dC, vL, vC));
+		Mouvement m = new Mouvement(dL, dC, vL, vC);
+		if (niv.appliqueMouvement(m))
+			mouvements.insereQueue(m);
+		else
+			Configuration.alerte("Déplacement impossible : " + m.toString());
 	}
 
 	public Sequence<Mouvement> mouvements() {

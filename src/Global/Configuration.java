@@ -61,6 +61,10 @@ public class Configuration {
 		affiche(1, "INFO : " + s);
 	}
 
+	public static void alerte(String s) {
+		affiche(2, "ALERTE : " + s);
+	}
+
 	public static void erreur(String s) {
 		affiche(3, "ERREUR : " + s);
 		System.exit(1);

@@ -107,27 +107,39 @@ public class Niveau {
 		cases[i][j] = resultat;
 	}
 
+	int contenu(int i, int j) {
+		return cases[i][j] & (POUSSEUR | CAISSE);
+	}
+
+	boolean appliqueMouvement(Mouvement m) {
+		int contenu = contenu(m.depuisL(), m.depuisC());
+		if (contenu != 0) {
+			if (estOccupable(m.versL(), m.versC())) {
+				supprime(contenu, m.depuisL(), m.depuisC());
+				ajoute(contenu, m.versL(), m.versC());
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public Coup deplace(int dLig, int dCol) {
 		int destL = pousseurL + dLig;
 		int destC = pousseurC + dCol;
-		Coup resultat = new Coup();
+		Coup resultat = new Coup(this);
 
 		if (aCaisse(destL, destC)) {
 			int dCaisL = destL + dLig;
 			int dCaisC = destC + dCol;
 
-			if (!aMur(dCaisL, dCaisC) && !aCaisse(dCaisL, dCaisC)) {
+			if (estOccupable(dCaisL, dCaisC)) {
 				resultat.ajouteDeplacement(destL, destC, dCaisL, dCaisC);
-				supprime(CAISSE, destL, destC);
-				ajoute(CAISSE, dCaisL, dCaisC);
 			} else {
 				return null;
 			}
 		}
 		if (!aMur(destL, destC)) {
 			resultat.ajouteDeplacement(pousseurL, pousseurC, destL, destC);
-			supprime(POUSSEUR, pousseurL, pousseurC);
-			ajoute(POUSSEUR, destL, destC);
 			return resultat;
 		}
 		return null;
@@ -179,6 +191,10 @@ public class Niveau {
 
 	public boolean aCaisse(int l, int c) {
 		return (cases[l][c] & CAISSE) != 0;
+	}
+
+	public boolean estOccupable(int l, int c) {
+		return (cases[l][c] & (MUR | CAISSE | POUSSEUR)) == 0;
 	}
 
 	public boolean estTermine() {

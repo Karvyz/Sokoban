@@ -51,4 +51,9 @@ public class Mouvement {
 	public int versC() {
 		return versC;
 	}
+
+	@Override
+	public String toString() {
+		return "(" + depuisL + ", " + depuisC + ") -> (" + versL + ", " + versC + ")";
+	}
 }

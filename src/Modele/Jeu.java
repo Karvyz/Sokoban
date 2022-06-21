@@ -41,12 +41,14 @@ public class Jeu extends Observable {
 		return n;
 	}
 
-	public Coup creerCoup(int x, int y) {
-		return n.creerCoup(x, y);
+	public Coup deplace(int x, int y) {
+		Coup resultat = n.deplace(x, y);
+		metAJour();
+		return resultat;
 	}
 
-	public void jouerCoup(Coup c) {
-		n.jouer(c);
+	public void joue(Coup c) {
+		n.joue(c);
 		metAJour();
 	}
 

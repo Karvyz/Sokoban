@@ -75,6 +75,8 @@ class IAAleatoire extends IA {
 				mur = false;
 		}
 
+		nouveauL += dL;
+		nouveauC += dC;
 		// Ajout des marques
 		for (int l = 0; l < niveau.lignes(); l++)
 			for (int c = 0; c < niveau.colonnes(); c++) {

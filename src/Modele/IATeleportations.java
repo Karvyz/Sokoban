@@ -51,7 +51,7 @@ class IATeleportations extends IA {
 		Configuration.info("Construction d'une séquence de " + nb + " coups");
 		for (int i = 0; i < nb; i++) {
 			// Mouvement du pousseur
-			Coup coup = new Coup();
+			Coup coup = niveau.creerCoup();
 			boolean libre = false;
 			while (!libre) {
 				int nouveauL = r.nextInt(niveau.lignes());

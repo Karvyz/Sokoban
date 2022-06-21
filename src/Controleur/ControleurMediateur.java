@@ -86,22 +86,27 @@ public class ControleurMediateur implements CollecteurEvenements {
 		}
 	}
 
+	void repercute(Coup cp) {
+		metAJourDirection(cp);
+		if (animationsActives) {
+			mouvement = new AnimationCoup(cp, vitesseAnimations, this);
+			animations.insereQueue(mouvement);
+		} else
+			testFin();
+	}
+
 	void joue(Coup cp) {
 		if (cp != null) {
-			jeu.jouerCoup(cp);
-			metAJourDirection(cp);
-			if (animationsActives) {
-				mouvement = new AnimationCoup(cp, vitesseAnimations, this);
-				animations.insereQueue(mouvement);
-			} else
-				testFin();
+			jeu.joue(cp);
+			repercute(cp);
 		}
 	}
 
 	void deplace(int dL, int dC) {
 		if (mouvement == null) {
-			Coup cp = jeu.creerCoup(dL, dC);
-			joue(cp);
+			Coup cp = jeu.deplace(dL, dC);
+			if (cp != null)
+				repercute(cp);
 		}
 	}
 

@@ -29,6 +29,12 @@ package Modele;
 import Global.Configuration;
 import Structures.Iterateur;
 
+class CoupNiveau extends Coup {
+	CoupNiveau(Niveau n) {
+		super(n);
+	}
+}
+
 public class Niveau implements Cloneable {
 	static final int VIDE = 0;
 	static final int MUR = 1;
@@ -126,10 +132,14 @@ public class Niveau implements Cloneable {
 		return false;
 	}
 
+	public void appliqueMarque(Marque m) {
+		fixerMarque(m.valeur, m.ligne, m.colonne);
+	}
+
 	public Coup deplace(int dLig, int dCol) {
 		int destL = pousseurL + dLig;
 		int destC = pousseurC + dCol;
-		Coup resultat = new Coup(this);
+		Coup resultat = creerCoup();
 
 		if (aCaisse(destL, destC)) {
 			int dCaisL = destL + dLig;
@@ -146,6 +156,19 @@ public class Niveau implements Cloneable {
 			return resultat;
 		}
 		return null;
+	}
+
+	void joue(Coup cp) {
+		Iterateur<Mouvement> it = cp.mouvements().iterateur();
+		while (it.aProchain()) {
+			Mouvement m = it.prochain();
+			appliqueMouvement(m);
+		}
+		Iterateur<Marque> it2 = cp.marques().iterateur();
+		while (it2.aProchain()) {
+			Marque m = it2.prochain();
+			appliqueMarque(m);
+		}
 	}
 
 	void ajouteMur(int i, int j) {
@@ -239,5 +262,9 @@ public class Niveau implements Cloneable {
 
 	public void fixerMarque(int m, int i, int j) {
 		cases[i][j] = (cases[i][j] & 0xFF) | (m << 8);
+	}
+
+	Coup creerCoup() {
+		return new CoupNiveau(this);
 	}
 }

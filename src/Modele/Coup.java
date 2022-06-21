@@ -29,7 +29,7 @@ package Modele;
 import Global.Configuration;
 import Structures.Sequence;
 
-public class Coup {
+public abstract class Coup {
 	Sequence<Mouvement> mouvements;
 	Niveau niv;
 	Sequence<Marque> marques;
@@ -49,10 +49,16 @@ public class Coup {
 	}
 
 	public void ajouteMarque(int l, int c, int val) {
-		marques.insereQueue(new Marque(l, c, val));
+		Marque m = new Marque(l, c, val);
+		niv.appliqueMarque(m);
+		marques.insereQueue(m);
 	}
 
 	public Sequence<Mouvement> mouvements() {
 		return mouvements;
+	}
+
+	public Sequence<Marque> marques() {
+		return marques;
 	}
 }

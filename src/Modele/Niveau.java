@@ -26,16 +26,7 @@ package Modele;
  *          38401 Saint Martin d'Hères
  */
 
-import Global.Configuration;
-import Structures.Iterateur;
-
-class CoupNiveau extends Coup {
-	CoupNiveau(Niveau n) {
-		super(n);
-	}
-}
-
-public class Niveau implements Cloneable {
+public class Niveau {
 	static final int VIDE = 0;
 	static final int MUR = 1;
 	static final int POUSSEUR = 2;
@@ -132,27 +123,27 @@ public class Niveau implements Cloneable {
 		return false;
 	}
 
-	public void appliqueMarque(Marque m) {
-		fixerMarque(m.valeur, m.ligne, m.colonne);
-	}
-
 	public Coup deplace(int dLig, int dCol) {
 		int destL = pousseurL + dLig;
 		int destC = pousseurC + dCol;
-		Coup resultat = creerCoup();
+		Coup resultat = new Coup();
 
 		if (aCaisse(destL, destC)) {
 			int dCaisL = destL + dLig;
 			int dCaisC = destC + dCol;
 
 			if (estOccupable(dCaisL, dCaisC)) {
-				resultat.ajouteDeplacement(destL, destC, dCaisL, dCaisC);
+				resultat.deplacementCaisse(destL, destC, dCaisL, dCaisC);
+				supprime(CAISSE, destL, destC);
+				ajoute(CAISSE, dCaisL, dCaisC);
 			} else {
 				return null;
 			}
 		}
 		if (!aMur(destL, destC)) {
-			resultat.ajouteDeplacement(pousseurL, pousseurC, destL, destC);
+			resultat.deplacementPousseur(pousseurL, pousseurC, destL, destC);
+			supprime(POUSSEUR, pousseurL, pousseurC);
+			ajoute(POUSSEUR, destL, destC);
 			return resultat;
 		}
 		return null;

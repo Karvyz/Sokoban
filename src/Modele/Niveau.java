@@ -26,6 +26,9 @@ package Modele;
  *          38401 Saint Martin d'Hères
  */
 
+import Global.Configuration;
+import Structures.Iterateur;
+
 public class Niveau {
 	static final int VIDE = 0;
 	static final int MUR = 1;
@@ -111,19 +114,7 @@ public class Niveau {
 		return cases[i][j] & (POUSSEUR | CAISSE);
 	}
 
-	boolean appliqueMouvement(Mouvement m) {
-		int contenu = contenu(m.depuisL(), m.depuisC());
-		if (contenu != 0) {
-			if (estOccupable(m.versL(), m.versC())) {
-				supprime(contenu, m.depuisL(), m.depuisC());
-				ajoute(contenu, m.versL(), m.versC());
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public Coup deplace(int dLig, int dCol) {
+	public Coup elaboreCoup(int dLig, int dCol) {
 		int destL = pousseurL + dLig;
 		int destC = pousseurC + dCol;
 		Coup resultat = new Coup();
@@ -134,31 +125,40 @@ public class Niveau {
 
 			if (estOccupable(dCaisL, dCaisC)) {
 				resultat.deplacementCaisse(destL, destC, dCaisL, dCaisC);
-				supprime(CAISSE, destL, destC);
-				ajoute(CAISSE, dCaisL, dCaisC);
 			} else {
 				return null;
 			}
 		}
 		if (!aMur(destL, destC)) {
 			resultat.deplacementPousseur(pousseurL, pousseurC, destL, destC);
-			supprime(POUSSEUR, pousseurL, pousseurC);
-			ajoute(POUSSEUR, destL, destC);
 			return resultat;
 		}
 		return null;
 	}
 
-	void joue(Coup cp) {
-		Iterateur<Mouvement> it = cp.mouvements().iterateur();
-		while (it.aProchain()) {
-			Mouvement m = it.prochain();
-			appliqueMouvement(m);
+	boolean appliqueMouvement(Mouvement m) {
+		int contenu = contenu(m.depuisL(), m.depuisC());
+		if (contenu != 0) {
+			if (estOccupable(m.versL(), m.versC())) {
+				supprime(contenu, m.depuisL(), m.depuisC());
+				ajoute(contenu, m.versL(), m.versC());
+				return true;
+			} else {
+				Configuration.alerte("Mouvement impossible, la destination est occupée : " + m);
+			}
+		} else {
+			Configuration.alerte("Mouvement impossible, aucun objet à déplacer : " + m);
 		}
+		return false;
+	}
+
+	void joue(Coup cp) {
+		appliqueMouvement(cp.caisse());
+		appliqueMouvement(cp.pousseur());
 		Iterateur<Marque> it2 = cp.marques().iterateur();
 		while (it2.aProchain()) {
 			Marque m = it2.prochain();
-			appliqueMarque(m);
+			fixerMarque(m.valeur, m.ligne, m.colonne);
 		}
 	}
 
@@ -253,9 +253,5 @@ public class Niveau {
 
 	public void fixerMarque(int m, int i, int j) {
 		cases[i][j] = (cases[i][j] & 0xFF) | (m << 8);
-	}
-
-	Coup creerCoup() {
-		return new CoupNiveau(this);
 	}
 }

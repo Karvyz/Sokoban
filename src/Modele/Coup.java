@@ -29,12 +29,9 @@ package Modele;
 import Global.Configuration;
 import Structures.Sequence;
 
-public abstract class Coup {
-	Sequence<Mouvement> mouvements;
-	Niveau niv;
-	Sequence<Marque> marques;
 public class Coup {
 	Mouvement pousseur, caisse;
+	Sequence<Marque> marques;
 
 	private Mouvement creeDeplacement(String nom, Mouvement existant, int dL, int dC, int vL, int vC) {
 		if (existant != null) {
@@ -47,14 +44,6 @@ public class Coup {
 		pousseur = creeDeplacement("pousseur", pousseur, dL, dC, vL, vC);
 	}
 
-	public void ajouteMarque(int l, int c, int val) {
-		Marque m = new Marque(l, c, val);
-		niv.appliqueMarque(m);
-		marques.insereQueue(m);
-	}
-
-	public Sequence<Mouvement> mouvements() {
-		return mouvements;
 	public void deplacementCaisse(int dL, int dC, int vL, int vC) {
 		caisse = creeDeplacement("caisse", caisse, dL, dC, vL, vC);
 	}
@@ -65,6 +54,11 @@ public class Coup {
 
 	public Mouvement caisse() {
 		return caisse;
+	}
+
+	public void ajouteMarque(int l, int c, int val) {
+		Marque m = new Marque(l, c, val);
+		marques.insereQueue(m);
 	}
 
 	public Sequence<Marque> marques() {

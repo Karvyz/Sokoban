@@ -43,6 +43,14 @@ public class AnimationCoup extends Animation {
 		miseAJour();
 	}
 
+	private void decaleObjet(Mouvement m, double facteur) {
+		if (m != null) {
+			double dL = (m.versL() - m.depuisL()) * facteur;
+			double dC = (m.versC() - m.depuisC()) * facteur;
+			control.decale(m.versL(), m.versC(), dL, dC);
+		}
+	}
+
 	@Override
 	public void miseAJour() {
 		if (!estTerminee()) {
@@ -51,13 +59,8 @@ public class AnimationCoup extends Animation {
 				progres = 1;
 			double facteur = progres - 1;
 
-			Iterateur<Mouvement> it = coup.mouvements().iterateur();
-			while (it.aProchain()) {
-				Mouvement m = it.prochain();
-				double dL = (m.versL() - m.depuisL()) * facteur;
-				double dC = (m.versC() - m.depuisC()) * facteur;
-				control.decale(m.versL(), m.versC(), dL, dC);
-			}
+			decaleObjet(coup.pousseur(), facteur);
+			decaleObjet(coup.caisse(), facteur);
 		}
 	}
 

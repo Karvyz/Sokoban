@@ -30,23 +30,28 @@ import Global.Configuration;
 import Structures.Sequence;
 
 public class Coup {
-	Sequence<Mouvement> mouvements;
-	Niveau niv;
+	Mouvement pousseur, caisse;
 
-	public Coup(Niveau n) {
-		niv = n;
-		mouvements = Configuration.nouvelleSequence();
+	private Mouvement creeDeplacement(String nom, Mouvement existant, int dL, int dC, int vL, int vC) {
+		if (existant != null) {
+			Configuration.alerte("Deplacement " + nom + " déjà présent : " + existant);
+		}
+		return new Mouvement(dL, dC, vL, vC);
 	}
 
-	public void ajouteDeplacement(int dL, int dC, int vL, int vC) {
-		Mouvement m = new Mouvement(dL, dC, vL, vC);
-		if (niv.appliqueMouvement(m))
-			mouvements.insereQueue(m);
-		else
-			Configuration.alerte("Déplacement impossible : " + m.toString());
+	public void deplacementPousseur(int dL, int dC, int vL, int vC) {
+		pousseur = creeDeplacement("pousseur", pousseur, dL, dC, vL, vC);
 	}
 
-	public Sequence<Mouvement> mouvements() {
-		return mouvements;
+	public void deplacementCaisse(int dL, int dC, int vL, int vC) {
+		caisse = creeDeplacement("caisse", caisse, dL, dC, vL, vC);
+	}
+
+	public Mouvement pousseur() {
+		return pousseur;
+	}
+
+	public Mouvement caisse() {
+		return caisse;
 	}
 }

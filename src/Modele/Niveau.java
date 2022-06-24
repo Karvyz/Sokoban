@@ -29,7 +29,7 @@ package Modele;
 import Global.Configuration;
 import Structures.Iterateur;
 
-public class Niveau {
+public class Niveau implements Cloneable {
 	static final int VIDE = 0;
 	static final int MUR = 1;
 	static final int POUSSEUR = 2;
@@ -136,20 +136,20 @@ public class Niveau {
 		return null;
 	}
 
-	boolean appliqueMouvement(Mouvement m) {
-		int contenu = contenu(m.depuisL(), m.depuisC());
-		if (contenu != 0) {
-			if (estOccupable(m.versL(), m.versC())) {
-				supprime(contenu, m.depuisL(), m.depuisC());
-				ajoute(contenu, m.versL(), m.versC());
-				return true;
+	void appliqueMouvement(Mouvement m) {
+		if (m != null) {
+			int contenu = contenu(m.depuisL(), m.depuisC());
+			if (contenu != 0) {
+				if (estOccupable(m.versL(), m.versC())) {
+					supprime(contenu, m.depuisL(), m.depuisC());
+					ajoute(contenu, m.versL(), m.versC());
+				} else {
+					Configuration.alerte("Mouvement impossible, la destination est occupée : " + m);
+				}
 			} else {
-				Configuration.alerte("Mouvement impossible, la destination est occupée : " + m);
+				Configuration.alerte("Mouvement impossible, aucun objet à déplacer : " + m);
 			}
-		} else {
-			Configuration.alerte("Mouvement impossible, aucun objet à déplacer : " + m);
 		}
-		return false;
 	}
 
 	void joue(Coup cp) {
@@ -160,6 +160,13 @@ public class Niveau {
 			Marque m = it2.prochain();
 			fixerMarque(m.valeur, m.ligne, m.colonne);
 		}
+	}
+
+	Coup deplace(int i, int j) {
+		Coup cp = elaboreCoup(i, j);
+		if (cp != null)
+			joue(cp);
+		return cp;
 	}
 
 	void ajouteMur(int i, int j) {

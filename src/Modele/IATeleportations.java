@@ -51,14 +51,14 @@ class IATeleportations extends IA {
 		Configuration.info("Construction d'une séquence de " + nb + " coups");
 		for (int i = 0; i < nb; i++) {
 			// Mouvement du pousseur
-			Coup coup = niveau.creerCoup();
+			Coup coup = new Coup();
 			boolean libre = false;
 			while (!libre) {
 				int nouveauL = r.nextInt(niveau.lignes());
 				int nouveauC = r.nextInt(niveau.colonnes());
 				if (niveau.estOccupable(nouveauL, nouveauC)) {
 					Configuration.info("Téléportation en (" + nouveauL + ", " + nouveauC + ") !");
-					coup.ajouteDeplacement(pousseurL, pousseurC, nouveauL, nouveauC);
+					coup.deplacementPousseur(pousseurL, pousseurC, nouveauL, nouveauC);
 					resultat.insereQueue(coup);
 					pousseurL = nouveauL;
 					pousseurC = nouveauC;

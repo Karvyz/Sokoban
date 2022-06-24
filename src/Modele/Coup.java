@@ -33,6 +33,10 @@ public class Coup {
 	Mouvement pousseur, caisse;
 	Sequence<Marque> marques;
 
+	Coup() {
+		marques = Configuration.nouvelleSequence();
+	}
+
 	private Mouvement creeDeplacement(String nom, Mouvement existant, int dL, int dC, int vL, int vC) {
 		if (existant != null) {
 			Configuration.alerte("Deplacement " + nom + " déjà présent : " + existant);

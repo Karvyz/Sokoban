@@ -71,42 +71,36 @@ public class ControleurMediateur implements CollecteurEvenements {
 	}
 
 	public void metAJourDirection(Coup c) {
-		// Mise à jour de la direction du pousseur (si le coup est inhabituel,
-		// construit par l'IA, il faut chercher le déplacement du pousseur)
-		Iterateur<Mouvement> it = c.mouvements().iterateur();
-		while (it.aProchain()) {
-			Mouvement m = it.prochain();
-			if ((m.versL() == jeu.lignePousseur()) && (m.versC() == jeu.colonnePousseur())) {
-				int dL = m.versL() - m.depuisL();
-				int dC = m.versC() - m.depuisC();
-				// On ignore les téléportations
-				if (dL*dL + dC*dC == 1)
-					vue.metAJourDirection(dL, dC);
-			}
+		// Mise à jour de la direction du pousseur
+		Mouvement m = c.pousseur();
+		if ((m.versL() == jeu.lignePousseur()) && (m.versC() == jeu.colonnePousseur())) {
+			int dL = m.versL() - m.depuisL();
+			int dC = m.versC() - m.depuisC();
+			// On ignore les téléportations
+			if (dL*dL + dC*dC == 1)
+				vue.metAJourDirection(dL, dC);
 		}
-	}
-
-	void repercute(Coup cp) {
-		metAJourDirection(cp);
-		if (animationsActives) {
-			mouvement = new AnimationCoup(cp, vitesseAnimations, this);
-			animations.insereQueue(mouvement);
-		} else
-			testFin();
 	}
 
 	void joue(Coup cp) {
 		if (cp != null) {
 			jeu.joue(cp);
-			repercute(cp);
+			metAJourDirection(cp);
+			if (animationsActives) {
+				mouvement = new AnimationCoup(cp, vitesseAnimations, this);
+				animations.insereQueue(mouvement);
+			} else
+				testFin();
+		} else {
+			Configuration.alerte("Coup null fourni, probablement un bug dans l'IA");
 		}
 	}
 
 	void deplace(int dL, int dC) {
 		if (mouvement == null) {
-			Coup cp = jeu.deplace(dL, dC);
+			Coup cp = jeu.elaboreCoup(dL, dC);
 			if (cp != null)
-				repercute(cp);
+				joue(cp);
 		}
 	}
 

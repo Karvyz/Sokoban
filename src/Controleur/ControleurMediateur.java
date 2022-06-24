@@ -70,22 +70,10 @@ public class ControleurMediateur implements CollecteurEvenements {
 			deplace(dL, dC);
 	}
 
-	public void metAJourDirection(Coup c) {
-		// Mise à jour de la direction du pousseur
-		Mouvement m = c.pousseur();
-		if ((m.versL() == jeu.lignePousseur()) && (m.versC() == jeu.colonnePousseur())) {
-			int dL = m.versL() - m.depuisL();
-			int dC = m.versC() - m.depuisC();
-			// On ignore les téléportations
-			if (dL*dL + dC*dC == 1)
-				vue.metAJourDirection(dL, dC);
-		}
-	}
-
 	void joue(Coup cp) {
 		if (cp != null) {
 			jeu.joue(cp);
-			metAJourDirection(cp);
+			vue.metAJourDirection(cp.dirPousseurL(), cp.dirPousseurC());
 			if (animationsActives) {
 				mouvement = new AnimationCoup(cp, vitesseAnimations, this);
 				animations.insereQueue(mouvement);

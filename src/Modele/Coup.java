@@ -32,6 +32,7 @@ import Structures.Sequence;
 public class Coup {
 	Mouvement pousseur, caisse;
 	Sequence<Marque> marques;
+	int dirPousseurL, dirPousseurC;
 
 	Coup() {
 		marques = Configuration.nouvelleSequence();
@@ -46,6 +47,15 @@ public class Coup {
 
 	public void deplacementPousseur(int dL, int dC, int vL, int vC) {
 		pousseur = creeDeplacement("pousseur", pousseur, dL, dC, vL, vC);
+		dirPousseurL = vL - dL;
+		dirPousseurC = vC - dC;
+		if (dirPousseurC*dirPousseurC > dirPousseurL*dirPousseurL) {
+			dirPousseurL = 0;
+			dirPousseurC = dirPousseurC < 0 ? -1 : 1;
+		} else {
+			dirPousseurL = dirPousseurL < 0 ? -1 : 1;
+			dirPousseurC = 0;
+		}
 	}
 
 	public void deplacementCaisse(int dL, int dC, int vL, int vC) {
@@ -67,5 +77,13 @@ public class Coup {
 
 	public Sequence<Marque> marques() {
 		return marques;
+	}
+
+	public int dirPousseurL() {
+		return dirPousseurL;
+	}
+
+	public int dirPousseurC() {
+		return dirPousseurC;
 	}
 }

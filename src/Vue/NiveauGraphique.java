@@ -192,6 +192,9 @@ public class NiveauGraphique extends JComponent implements Observateur {
 			case -1:
 				direction = 0;
 				break;
+			case 0:
+				// Rien, pas de mouvement, direction inchangée
+				break;
 			case 1:
 				direction = 2;
 				break;

@@ -27,10 +27,10 @@
 
 import java.util.Random;
 
-public class TestSequence {
+public class TestSequenceListe {
 	static int min, max, count;
 
-	static int operation(Sequence seq, int code) {
+	static int operation(SequenceListe seq, int code) {
 		int s;
 		System.out.println(seq);
 		switch (code) {
@@ -63,19 +63,15 @@ public class TestSequence {
 
 	public static void main(String[] args) {
 		Random r = new Random();
-		Sequence s1, s2;
-		s1 = new SequenceTableau();
-		s2 = new SequenceListe();
+		SequenceListe s = new SequenceListe();
 
-		assert (s1.estVide());
-		assert (s2.estVide());
+		assert (s.estVide());
 		min = -1;
 		max = 0;
 		count = 0;
 		for (int i = 0; i < 1000; i++) {
 			int code = r.nextInt(4);
-			int r1 = operation(s1, code);
-			int r2 = operation(s2, code);
+			int result = operation(s, code);
 			if (code < 2) {
 				count++;
 				if (code < 1)
@@ -88,7 +84,6 @@ public class TestSequence {
 					min++;
 				}
 			}
-			assert (r1 == r2);
 		}
 	}
 }

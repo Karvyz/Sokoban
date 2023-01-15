@@ -25,9 +25,10 @@
  *          38401 Saint Martin d'Hères
  */
 
-class SequenceListe {
+class SequenceListe implements Sequence {
 	Maillon tete, queue;
 
+	@Override
 	public void insereTete(int element) {
 		Maillon m = new Maillon(element, tete);
 		if (queue == null)
@@ -35,6 +36,7 @@ class SequenceListe {
 		tete = m;
 	}
 
+	@Override
 	public void insereQueue(int element) {
 		Maillon m = new Maillon(element, null);
 		if (queue == null) {
@@ -45,6 +47,7 @@ class SequenceListe {
 		}
 	}
 
+	@Override
 	public int extraitTete() {
 		int resultat;
 		// Exception si tete == null (sequence vide)
@@ -56,10 +59,12 @@ class SequenceListe {
 		return resultat;
 	}
 
+	@Override
 	public boolean estVide() {
 		return tete == null;
 	}
 
+	@Override
 	public String toString() {
 		String resultat = "SequenceListe [ ";
 		boolean premier = true;

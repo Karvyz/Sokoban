@@ -63,6 +63,7 @@ public class TestSequenceListe {
 
 	public static void main(String[] args) {
 		Random r = new Random();
+		// Le test est spécifique à la classe SequenceListe, nous factoriserons plus tard
 		SequenceListe s = new SequenceListe();
 
 		assert (s.estVide());

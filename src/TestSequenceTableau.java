@@ -63,6 +63,7 @@ public class TestSequenceTableau {
 
 	public static void main(String[] args) {
 		Random r = new Random();
+		// Le test est spécifique à la classe SequenceTableau, nous factoriserons plus tard
 		SequenceTableau s = new SequenceTableau();
 
 		assert (s.estVide());

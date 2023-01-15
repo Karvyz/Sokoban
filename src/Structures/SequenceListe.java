@@ -29,8 +29,6 @@ package Structures;
 public class SequenceListe<E> implements Sequence<E> {
 	Maillon<E> tete, queue;
 
-	// Les méthodes implémentant l'interface
-	// doivent être publiques
 	@Override
 	public void insereQueue(E element) {
 		Maillon<E> m = new Maillon<>(element, null);

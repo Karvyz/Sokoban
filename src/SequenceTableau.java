@@ -25,7 +25,7 @@
  *          38401 Saint Martin d'Hères
  */
 
-class SequenceTableau implements Sequence {
+class SequenceTableau {
 	int[] elements;
 	int taille, debut;
 
@@ -51,7 +51,6 @@ class SequenceTableau implements Sequence {
 		}
 	}
 
-	@Override
 	public void insereTete(int element) {
 		redimensionne();
 		debut = debut - 1;
@@ -61,14 +60,12 @@ class SequenceTableau implements Sequence {
 		taille++;
 	}
 
-	@Override
 	public void insereQueue(int element) {
 		redimensionne();
 		elements[(debut + taille) % elements.length] = element;
 		taille++;
 	}
 
-	@Override
 	public int extraitTete() {
 		// Resultat invalide si la sequence est vide
 		int resultat = elements[debut];
@@ -77,12 +74,10 @@ class SequenceTableau implements Sequence {
 		return resultat;
 	}
 
-	@Override
 	public boolean estVide() {
 		return taille == 0;
 	}
 
-	@Override
 	public String toString() {
 		String resultat = "SequenceTable [ ";
 		int pos = debut;

@@ -29,6 +29,8 @@ package Modele;
 import Global.Configuration;
 import Structures.Iterateur;
 
+import java.util.Arrays;
+
 public class Niveau implements Cloneable {
 	static final int VIDE = 0;
 	static final int MUR = 1;
@@ -78,6 +80,15 @@ public class Niveau implements Cloneable {
 	void videCase(int i, int j) {
 		redimensionne(i, j);
 		cases[i][j] = VIDE;
+	}
+	boolean[][] case_checked(){
+		boolean[][] cases = new boolean[l][c];
+		for (int i = 0; i < l; i++) {
+			for (int j = 0; j < c; j++) {
+				cases[i][j] = true;
+			}
+		}
+		return cases;
 	}
 
 	void supprime(int contenu, int i, int j) {
@@ -129,6 +140,7 @@ public class Niveau implements Cloneable {
 				return null;
 			}
 		}
+		System.out.println("yes " + destC + " " + destL);
 		if (!aMur(destL, destC)) {
 			resultat.deplacementPousseur(pousseurL, pousseurC, destL, destC);
 			return resultat;

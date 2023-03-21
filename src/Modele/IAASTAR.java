@@ -43,15 +43,7 @@ public class IAASTAR extends IA{
                 }
                 Collections.reverse(chemin);
                 for (int i = 0; i < chemin.size() - 1; i++) {
-                    int k = chemin.get(i + 1).x - chemin.get(i).x;
-                    int l = chemin.get(i + 1).y - chemin.get(i).y;
                     resultat.insereQueue(niveau.deplace(chemin.get(i + 1).y - chemin.get(i).y, chemin.get(i + 1).x - chemin.get(i).x));
-                }
-
-
-                Iterateur<Coup> yes = resultat.iterateur();
-                while(yes.aProchain()) {
-                    System.out.println(yes.prochain());
                 }
                 return resultat;
             }
@@ -60,7 +52,6 @@ public class IAASTAR extends IA{
     }
 
     private boolean parcours(Case current, int destx, int desty){
-        System.out.println(current.x + " " + current.y);
 
         if (current.x == destx && current.y == desty){
             return true;

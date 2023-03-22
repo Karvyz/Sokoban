@@ -244,6 +244,21 @@ public class Niveau implements Cloneable {
 		return pousseurC;
 	}
 
+	public int[] Caisselc() {
+		int[] resultat = new int[2];
+		for (int i=0; i<l; i++){
+			for (int j=0; j<c; j++){
+				if (aCaisse(i,j)) {
+					resultat[0] = i;
+					resultat[1] = j;
+					return resultat;}
+			}
+		}
+		resultat[0]=-1;
+		resultat[1]=-1;
+		return resultat;
+	}
+
 	// Par convention, la méthode clone de java requiert :
 	// - que la classe clonée implémente Cloneable
 	// - que le resultat soit construit avec la méthode clone de la classe parente (pour qu'un clonage

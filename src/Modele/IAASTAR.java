@@ -3,10 +3,7 @@ package Modele;
 import Global.Configuration;
 import Structures.Sequence;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Deque;
+import java.util.*;
 
 public class IAASTAR extends IA{
 
@@ -25,26 +22,36 @@ public class IAASTAR extends IA{
 
         int c;
         int l;
-
-        int pousseurc;
-        int pousseurl;
+        Niveau niveau;
         ArrayList<Case> chemin;
         Case2 pere;
 
-        Case2(ArrayList<Case> chemin, Case2 pere, int l, int c, int pousseurl, int pousseurc) {
+        Case2(ArrayList<Case> chemin, Case2 pere, int l, int c) {
             this.chemin = chemin;
             this.pere = pere;
             this.c = c;
             this.l = l;
+            this.niveau = pere.niveau.clone();
+        }
+        Case2(ArrayList<Case> chemin, Case2 pere, int l, int c, Niveau niveau) {
+            this.chemin = chemin;
+            this.pere = pere;
+            this.c = c;
+            this.l = l;
+            this.niveau = niveau;
         }
     }
     @Override
     public Sequence<Coup> joue() {
-        int destx = 8, desty = 7;
-        int pousseurL = niveau.lignePousseur();
-        int pousseurC = niveau.colonnePousseur();
         Sequence<Coup> resultat = Configuration.nouvelleSequence();
-        ArrayList<Case> chemin = deplacement_caisse(desty, destx, pousseurL, pousseurC);
+        int[] caisse = niveau.caisselc();
+        System.out.println("caisse : " + Arrays.toString(caisse));
+        int[] destination = niveau.objectivelc();
+        System.out.println("objective : " + Arrays.toString(destination));
+
+        ArrayList<Case> chemin = deplacement_caisse(caisse[0], caisse[1], destination[0], destination[1]);
+        System.out.println("Resultat");
+        chemin.forEach(c -> System.out.println(c.l + " " + c.c));
         for (int i = 0; i < chemin.size() - 1; i++) {
             resultat.insereQueue(niveau.deplace(chemin.get(i + 1).l - chemin.get(i).l, chemin.get(i + 1).c - chemin.get(i).c));
         }
@@ -54,11 +61,12 @@ public class IAASTAR extends IA{
     private ArrayList<Case> deplacement_caisse(int startl, int startc, int destl, int destc) {
         ArrayDeque<Case2> fifo = new ArrayDeque<>();
         boolean[][] cases_availables = niveau.case_checked();
-        fifo.add(new Case2(new ArrayList<>(), null, startl, startc, niveau.pousseurL, niveau.pousseurC));
+        fifo.add(new Case2(new ArrayList<>(), null, startl, startc, niveau.clone()));
         while (!fifo.isEmpty()){
             Case2 pere = fifo.getFirst();
             fifo.removeFirst();
             if (pere.l == destl && pere.c == destc) {
+                System.out.println("fini");
                 ArrayList<ArrayList<Case>> chemins = new ArrayList<>();
                 while(pere != null) {
                     chemins.add(pere.chemin);
@@ -71,15 +79,39 @@ public class IAASTAR extends IA{
                 }
                 return chemin_global;
             }
-            Case2 fils = new Case2(null, pere, pere.l + 1, pere.c, 0, 0);
-            int objectivel = pere.l + (pere.l - fils.l);
-            int objectivec = pere.c + (pere.c - fils.c);
-            ArrayList<Case> chemin = deplacement_possible(objectivel, objectivec, pere.pousseurl, pere.pousseurc);
-            if (chemin.size() > 0) {
-                fils.pousseurc = objectivec;
-                fils.pousseurl = objectivel;
-                fils.chemin = chemin;
-                fifo.push(fils);
+            ArrayList<Case2> liste_fils = new ArrayList<>();
+            liste_fils.add(new Case2(null, pere, pere.l + 1, pere.c));
+            liste_fils.add(new Case2(null, pere, pere.l - 1, pere.c));
+            liste_fils.add(new Case2(null, pere, pere.l, pere.c + 1));
+            liste_fils.add(new Case2(null, pere, pere.l, pere.c - 1));
+            for (Case2 fils : liste_fils) {
+                System.out.println("pere : " + pere.l + " " + pere.c);
+                if (!cases_availables[fils.l][fils.c]) {
+                    continue;
+                }
+                cases_availables[fils.l][fils.c] = false;
+                if (fils.niveau.aMur(fils.l, fils.c))
+                    continue;
+
+                int objectivel = pere.l + (pere.l - fils.l);
+                int objectivec = pere.c + (pere.c - fils.c);
+                System.out.println("pousseur vas de " + pere.niveau.pousseurL + " " + pere.niveau.pousseurC + " vers " + objectivel + " " + objectivec);
+                ArrayList<Case> chemin = deplacement_possible(objectivel, objectivec, pere.niveau.pousseurL, pere.niveau.pousseurC);
+                chemin.add(new Case(pere.l, pere.c, null));
+                System.out.println(chemin.size());
+                if (chemin.size() > 0) {
+                    for (Case c : chemin) {
+                        System.out.println("fils : " + c.l + " " + c.c);
+                    }
+                    for (Case c : chemin) {
+                        if (c.l != fils.niveau.pousseurL && c.c != fils.niveau.pousseurC) {
+                            fils.niveau.deplace(c.l - fils.niveau.pousseurL,  c.c - fils.niveau.pousseurC);
+                        }
+                    }
+                    fils.chemin = chemin;
+
+                    fifo.push(fils);
+                }
             }
         }
         return new ArrayList<>();

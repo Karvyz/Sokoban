@@ -29,8 +29,6 @@ package Modele;
 import Global.Configuration;
 import Structures.Iterateur;
 
-import java.util.Arrays;
-
 public class Niveau implements Cloneable {
 	static final int VIDE = 0;
 	static final int MUR = 1;
@@ -244,11 +242,26 @@ public class Niveau implements Cloneable {
 		return pousseurC;
 	}
 
-	public int[] Caisselc() {
+	public int[] caisselc() {
 		int[] resultat = new int[2];
 		for (int i=0; i<l; i++){
 			for (int j=0; j<c; j++){
 				if (aCaisse(i,j)) {
+					resultat[0] = i;
+					resultat[1] = j;
+					return resultat;}
+			}
+		}
+		resultat[0]=-1;
+		resultat[1]=-1;
+		return resultat;
+	}
+
+	public int[] objectivelc() {
+		int[] resultat = new int[2];
+		for (int i=0; i<l; i++){
+			for (int j=0; j<c; j++){
+				if (aBut(i,j)) {
 					resultat[0] = i;
 					resultat[1] = j;
 					return resultat;}

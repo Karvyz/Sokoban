@@ -53,13 +53,10 @@ public class IAASTAR extends IA{
     public Sequence<Coup> joue() {
         Sequence<Coup> resultat = Configuration.nouvelleSequence();
         int[] caisse = niveau.caisselc();
-        System.out.println("caisse : " + Arrays.toString(caisse));
         int[] destination = niveau.objectivelc();
-        System.out.println("objective : " + Arrays.toString(destination));
-
+        long start_timer = System.currentTimeMillis();
         ArrayList<Case> chemin = deplacement_caisse(caisse[0], caisse[1], destination[0], destination[1]);
-        System.out.println("Resultat");
-        chemin.forEach(c -> System.out.println(c.l + " " + c.c));
+        System.out.println("Duree de recherche : " + (System.currentTimeMillis() - start_timer) + "ms");
         for (int i = 0; i < chemin.size() - 1; i++) {
             resultat.insereQueue(niveau.deplace(chemin.get(i + 1).l - chemin.get(i).l, chemin.get(i + 1).c - chemin.get(i).c));
         }
@@ -68,12 +65,10 @@ public class IAASTAR extends IA{
 
     private ArrayList<Case> deplacement_caisse(int startl, int startc, int destl, int destc) {
         PriorityQueue<Case2> fap = new PriorityQueue<>(new Case2Comparator());
-        boolean[][] cases_availables = niveau.case_checked();
         fap.add(new Case2(new ArrayList<>(), null, startl, startc, niveau.clone()));
         while (!fap.isEmpty()){
             Case2 pere = fap.poll();
             if (pere.l == destl && pere.c == destc) {
-                System.out.println("fini");
                 ArrayList<ArrayList<Case>> chemins = new ArrayList<>();
                 while(pere != null) {
                     chemins.add(pere.chemin);
@@ -81,9 +76,8 @@ public class IAASTAR extends IA{
                 }
                 Collections.reverse(chemins);
                 ArrayList<Case> chemin_global = new ArrayList<>();
+                chemin_global.add(new Case(niveau.pousseurL, niveau.pousseurC, null));
                 for (ArrayList<Case> chemin : chemins) {
-                    System.out.println("part chemin");
-                    chemin.forEach(c -> System.out.println(c.l + " " + c.c));
                     chemin_global.addAll(chemin);
                 }
                 return chemin_global;
@@ -97,17 +91,14 @@ public class IAASTAR extends IA{
 
                 if (fils.niveau.aMur(fils.l, fils.c))
                     continue;
-                System.out.println("nouveau fils " + fils.l + " " + fils.c + " qui a comme pere : " + pere.l + " " + pere.c);
 
                 int objectivel = pere.l + (pere.l - fils.l);
                 int objectivec = pere.c + (pere.c - fils.c);
-                System.out.println("pousseur vas de " + fils.niveau.pousseurL + " " + fils.niveau.pousseurC + " vers " + objectivel + " " + objectivec);
                 if (objectivec == fils.niveau.pousseurC && objectivel == fils.niveau.pousseurL) {
                     accept_case2(fap, new ArrayList<>(), pere, fils);
                 }
                 else {
                     ArrayList<Case> chemin = deplacement_pousseur(pere.niveau, objectivel, objectivec);
-                    System.out.println("taille chemin : " + chemin.size());
                     if (chemin.size() > 0) {
                         accept_case2(fap, chemin, pere, fils);
                     }
@@ -119,9 +110,6 @@ public class IAASTAR extends IA{
 
     void accept_case2(PriorityQueue<Case2> fap, ArrayList<Case> chemin, Case2 pere, Case2 fils) {
         chemin.add(new Case(pere.l, pere.c, null));
-        System.out.println("taille chemin accepté : " + chemin.size());
-        System.out.println("chemin accepté :");
-        chemin.forEach(c -> System.out.println(c.l + " " + c.c));
 
         for (Case c : chemin) {
             if (fils.niveau.pousseurL != c.l || fils.niveau.pousseurC != c.c) {
@@ -144,7 +132,7 @@ public class IAASTAR extends IA{
             Case current = fifo.getFirst();
             fifo.removeFirst();
             if (current.c == destc && current.l == destl) {
-                while (current != null) {
+                while (current.l != n.pousseurL || current.c != n.pousseurC) {
                     chemin.add(current);
                     current = current.pere;
                 }

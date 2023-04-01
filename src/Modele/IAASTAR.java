@@ -20,6 +20,7 @@ public class IAASTAR extends IA{
 
     class Case2 {
 
+        int taille_chemin_total;
         int c;
         int l;
         Niveau niveau;
@@ -31,6 +32,7 @@ public class IAASTAR extends IA{
             this.pere = pere;
             this.c = c;
             this.l = l;
+            taille_chemin_total = 0;
             this.niveau = pere.niveau.clone();
         }
         Case2(ArrayList<Case> chemin, Case2 pere, int l, int c, Niveau niveau) {
@@ -38,7 +40,13 @@ public class IAASTAR extends IA{
             this.pere = pere;
             this.c = c;
             this.l = l;
+            taille_chemin_total = 0;
             this.niveau = niveau;
+        }
+    }
+    class Case2Comparator implements Comparator<Case2> {
+        public int compare(Case2 c1, Case2 c2) {
+            return c1.taille_chemin_total - c2.taille_chemin_total;
         }
     }
     @Override
@@ -59,12 +67,11 @@ public class IAASTAR extends IA{
     }
 
     private ArrayList<Case> deplacement_caisse(int startl, int startc, int destl, int destc) {
-        ArrayDeque<Case2> fifo = new ArrayDeque<>();
+        PriorityQueue<Case2> fap = new PriorityQueue<>(new Case2Comparator());
         boolean[][] cases_availables = niveau.case_checked();
-        fifo.add(new Case2(new ArrayList<>(), null, startl, startc, niveau.clone()));
-        while (!fifo.isEmpty()){
-            Case2 pere = fifo.getFirst();
-            fifo.removeFirst();
+        fap.add(new Case2(new ArrayList<>(), null, startl, startc, niveau.clone()));
+        while (!fap.isEmpty()){
+            Case2 pere = fap.poll();
             if (pere.l == destl && pere.c == destc) {
                 System.out.println("fini");
                 ArrayList<ArrayList<Case>> chemins = new ArrayList<>();
@@ -87,25 +94,22 @@ public class IAASTAR extends IA{
             liste_fils.add(new Case2(null, pere, pere.l, pere.c + 1));
             liste_fils.add(new Case2(null, pere, pere.l, pere.c - 1));
             for (Case2 fils : liste_fils) {
-                System.out.println("nouveau fils " + fils.l + " " + fils.c + " qui a comme pere : " + pere.l + " " + pere.c);
-                if (!cases_availables[fils.l][fils.c]) {
-                    continue;
-                }
-                cases_availables[fils.l][fils.c] = false;
+
                 if (fils.niveau.aMur(fils.l, fils.c))
                     continue;
+                System.out.println("nouveau fils " + fils.l + " " + fils.c + " qui a comme pere : " + pere.l + " " + pere.c);
 
                 int objectivel = pere.l + (pere.l - fils.l);
                 int objectivec = pere.c + (pere.c - fils.c);
                 System.out.println("pousseur vas de " + fils.niveau.pousseurL + " " + fils.niveau.pousseurC + " vers " + objectivel + " " + objectivec);
                 if (objectivec == fils.niveau.pousseurC && objectivel == fils.niveau.pousseurL) {
-                    accept_case2(fifo, new ArrayList<>(), pere, fils);
+                    accept_case2(fap, new ArrayList<>(), pere, fils);
                 }
                 else {
                     ArrayList<Case> chemin = deplacement_pousseur(pere.niveau, objectivel, objectivec);
                     System.out.println("taille chemin : " + chemin.size());
                     if (chemin.size() > 0) {
-                        accept_case2(fifo, chemin, pere, fils);
+                        accept_case2(fap, chemin, pere, fils);
                     }
                 }
             }
@@ -113,7 +117,7 @@ public class IAASTAR extends IA{
         return new ArrayList<>();
     }
 
-    void accept_case2(ArrayDeque<Case2> fifo, ArrayList<Case> chemin, Case2 pere, Case2 fils) {
+    void accept_case2(PriorityQueue<Case2> fap, ArrayList<Case> chemin, Case2 pere, Case2 fils) {
         chemin.add(new Case(pere.l, pere.c, null));
         System.out.println("taille chemin accepté : " + chemin.size());
         System.out.println("chemin accepté :");
@@ -125,8 +129,8 @@ public class IAASTAR extends IA{
             }
         }
         fils.chemin = chemin;
-
-        fifo.push(fils);
+        fils.taille_chemin_total = pere.taille_chemin_total + chemin.size();
+        fap.add(fils);
     }
 
 

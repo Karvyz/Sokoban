@@ -102,7 +102,7 @@ public class IAASTAR extends IA{
                     accept_case2(fifo, new ArrayList<>(), pere, fils);
                 }
                 else {
-                    ArrayList<Case> chemin = deplacement_possible(objectivel, objectivec, pere.niveau.pousseurL, pere.niveau.pousseurC);
+                    ArrayList<Case> chemin = deplacement_pousseur(pere.niveau, objectivel, objectivec);
                     System.out.println("taille chemin : " + chemin.size());
                     if (chemin.size() > 0) {
                         accept_case2(fifo, chemin, pere, fils);
@@ -131,44 +131,37 @@ public class IAASTAR extends IA{
 
 
 
-    private ArrayList<Case> deplacement_possible(int destl, int destc, int startl, int startc){
+    private ArrayList<Case> deplacement_pousseur(Niveau n, int destl, int destc){
         ArrayList<Case> chemin = new ArrayList<>();
         ArrayDeque<Case> fifo = new ArrayDeque<>();
         boolean[][] cases_availables = niveau.case_checked();
-        fifo.add(new Case(startl, startc, null));
+        fifo.add(new Case(n.pousseurL, n.pousseurC, null));
         while (!fifo.isEmpty()){
-            Case tmp = fifo.getFirst();
+            Case current = fifo.getFirst();
             fifo.removeFirst();
-            if (parcours(tmp, destl, destc, cases_availables, fifo)) {
-                while (tmp != null) {
-                    chemin.add(tmp);
-                    tmp = tmp.pere;
+            if (current.c == destc && current.l == destl) {
+                while (current != null) {
+                    chemin.add(current);
+                    current = current.pere;
                 }
                 Collections.reverse(chemin);
 
                 return chemin;
             }
-        }
-        return chemin;
-    }
-
-    private boolean parcours(Case current, int destl, int destc, boolean[][] cases_availables, Deque<Case> fifo){
-        if (current.c == destc && current.l == destl){
-            return true;
-        }
-        ArrayList<Case> listeFils = new ArrayList<>();
-        listeFils.add(new Case(current.l + 1, current.c, current));
-        listeFils.add(new Case(current.l - 1, current.c, current));
-        listeFils.add(new Case(current.l, current.c + 1, current));
-        listeFils.add(new Case(current.l, current.c - 1, current));
-        for (Case fils :listeFils){
-            if (cases_availables[fils.l][fils.c]) {
-                cases_availables[fils.l][fils.c] = false;
-                if (niveau.estOccupable(fils.l, fils.c)) {
-                    fifo.add(fils);
+            ArrayList<Case> listeFils = new ArrayList<>();
+            listeFils.add(new Case(current.l + 1, current.c, current));
+            listeFils.add(new Case(current.l - 1, current.c, current));
+            listeFils.add(new Case(current.l, current.c + 1, current));
+            listeFils.add(new Case(current.l, current.c - 1, current));
+            for (Case fils :listeFils){
+                if (cases_availables[fils.l][fils.c]) {
+                    cases_availables[fils.l][fils.c] = false;
+                    if (n.estOccupable(fils.l, fils.c)) {
+                        fifo.add(fils);
+                    }
                 }
             }
         }
-        return false;
+        return chemin;
     }
 }

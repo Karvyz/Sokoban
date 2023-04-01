@@ -75,6 +75,8 @@ public class IAASTAR extends IA{
                 Collections.reverse(chemins);
                 ArrayList<Case> chemin_global = new ArrayList<>();
                 for (ArrayList<Case> chemin : chemins) {
+                    System.out.println("part chemin");
+                    chemin.forEach(c -> System.out.println(c.l + " " + c.c));
                     chemin_global.addAll(chemin);
                 }
                 return chemin_global;
@@ -85,7 +87,7 @@ public class IAASTAR extends IA{
             liste_fils.add(new Case2(null, pere, pere.l, pere.c + 1));
             liste_fils.add(new Case2(null, pere, pere.l, pere.c - 1));
             for (Case2 fils : liste_fils) {
-                System.out.println("pere : " + pere.l + " " + pere.c);
+                System.out.println("nouveau fils " + fils.l + " " + fils.c + " qui a comme pere : " + pere.l + " " + pere.c);
                 if (!cases_availables[fils.l][fils.c]) {
                     continue;
                 }
@@ -95,26 +97,36 @@ public class IAASTAR extends IA{
 
                 int objectivel = pere.l + (pere.l - fils.l);
                 int objectivec = pere.c + (pere.c - fils.c);
-                System.out.println("pousseur vas de " + pere.niveau.pousseurL + " " + pere.niveau.pousseurC + " vers " + objectivel + " " + objectivec);
-                ArrayList<Case> chemin = deplacement_possible(objectivel, objectivec, pere.niveau.pousseurL, pere.niveau.pousseurC);
-                chemin.add(new Case(pere.l, pere.c, null));
-                System.out.println(chemin.size());
-                if (chemin.size() > 0) {
-                    for (Case c : chemin) {
-                        System.out.println("fils : " + c.l + " " + c.c);
+                System.out.println("pousseur vas de " + fils.niveau.pousseurL + " " + fils.niveau.pousseurC + " vers " + objectivel + " " + objectivec);
+                if (objectivec == fils.niveau.pousseurC && objectivel == fils.niveau.pousseurL) {
+                    accept_case2(fifo, new ArrayList<>(), pere, fils);
+                }
+                else {
+                    ArrayList<Case> chemin = deplacement_possible(objectivel, objectivec, pere.niveau.pousseurL, pere.niveau.pousseurC);
+                    System.out.println("taille chemin : " + chemin.size());
+                    if (chemin.size() > 0) {
+                        accept_case2(fifo, chemin, pere, fils);
                     }
-                    for (Case c : chemin) {
-                        if (c.l != fils.niveau.pousseurL && c.c != fils.niveau.pousseurC) {
-                            fils.niveau.deplace(c.l - fils.niveau.pousseurL,  c.c - fils.niveau.pousseurC);
-                        }
-                    }
-                    fils.chemin = chemin;
-
-                    fifo.push(fils);
                 }
             }
         }
         return new ArrayList<>();
+    }
+
+    void accept_case2(ArrayDeque<Case2> fifo, ArrayList<Case> chemin, Case2 pere, Case2 fils) {
+        chemin.add(new Case(pere.l, pere.c, null));
+        System.out.println("taille chemin accepté : " + chemin.size());
+        System.out.println("chemin accepté :");
+        chemin.forEach(c -> System.out.println(c.l + " " + c.c));
+
+        for (Case c : chemin) {
+            if (fils.niveau.pousseurL != c.l || fils.niveau.pousseurC != c.c) {
+                fils.niveau.deplace(c.l - fils.niveau.pousseurL,  c.c - fils.niveau.pousseurC);
+            }
+        }
+        fils.chemin = chemin;
+
+        fifo.push(fils);
     }
 
 

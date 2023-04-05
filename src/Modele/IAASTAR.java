@@ -21,6 +21,7 @@ public class IAASTAR extends IA{
     class Case2 {
 
         int taille_chemin_total;
+        int priorite;
         int c;
         int l;
         Niveau niveau;
@@ -46,7 +47,7 @@ public class IAASTAR extends IA{
     }
     class Case2Comparator implements Comparator<Case2> {
         public int compare(Case2 c1, Case2 c2) {
-            return c1.taille_chemin_total - c2.taille_chemin_total;
+            return c1.priorite - c2.priorite;
         }
     }
     @Override
@@ -61,6 +62,10 @@ public class IAASTAR extends IA{
             resultat.insereQueue(niveau.deplace(chemin.get(i + 1).l - chemin.get(i).l, chemin.get(i + 1).c - chemin.get(i).c));
         }
         return resultat;
+    }
+
+    int distanceManhattan(int l1, int c1, int l2, int c2) {
+        return Math.abs(l1 - l2) + Math.abs(c1 - c2);
     }
 
     private ArrayList<Case> deplacement_caisse(int startl, int startc, int destl, int destc) {
@@ -95,12 +100,12 @@ public class IAASTAR extends IA{
                 int objectivel = pere.l + (pere.l - fils.l);
                 int objectivec = pere.c + (pere.c - fils.c);
                 if (objectivec == fils.niveau.pousseurC && objectivel == fils.niveau.pousseurL) {
-                    accept_case2(fap, new ArrayList<>(), pere, fils);
+                    accept_case2(fap, new ArrayList<>(), pere, fils, destl, destc);
                 }
                 else {
                     ArrayList<Case> chemin = deplacement_pousseur(pere.niveau, objectivel, objectivec);
                     if (chemin.size() > 0) {
-                        accept_case2(fap, chemin, pere, fils);
+                        accept_case2(fap, chemin, pere, fils, destl, destc);
                     }
                 }
             }
@@ -108,7 +113,7 @@ public class IAASTAR extends IA{
         return new ArrayList<>();
     }
 
-    void accept_case2(PriorityQueue<Case2> fap, ArrayList<Case> chemin, Case2 pere, Case2 fils) {
+    void accept_case2(PriorityQueue<Case2> fap, ArrayList<Case> chemin, Case2 pere, Case2 fils, int destl, int destc) {
         chemin.add(new Case(pere.l, pere.c, null));
 
         for (Case c : chemin) {
@@ -118,6 +123,7 @@ public class IAASTAR extends IA{
         }
         fils.chemin = chemin;
         fils.taille_chemin_total = pere.taille_chemin_total + chemin.size();
+        fils.priorite = fils.taille_chemin_total + distanceManhattan(fils.l, fils.c, destl, destc);
         fap.add(fils);
     }
 

@@ -61,7 +61,9 @@ public class IAASTAR extends IA{
                 int[] destination = destinations.poll();
                 System.out.println("test chemin" + Arrays.toString(caisse) + " " + Arrays.toString(destination));
 
-                Result result = deplacement_caisse(n, caisse[0], caisse[1], destination[0], destination[1], 1000);
+                Result result = deplacement_caisse(n, caisse[0], caisse[1], destination[0], destination[1] ,true, 100);
+                if (result == null)
+                    result = deplacement_caisse(n, caisse[0], caisse[1], destination[0], destination[1] ,false, 100);
 
                 if (result != null) {
                     System.out.println("chemin possible");
@@ -88,11 +90,12 @@ public class IAASTAR extends IA{
         Sequence<Coup> resultat = Configuration.nouvelleSequence();
         long start_timer = System.currentTimeMillis();
         ArrayList<int[]> chemin_global = enumeration(niveau);
+        System.out.println("Duree de recherche : " + (System.currentTimeMillis() - start_timer) + "ms");
+
         if (chemin_global == null) {
             System.out.println("pas de chemin possible");
             return resultat;
         }
-        System.out.println("Duree de recherche : " + (System.currentTimeMillis() - start_timer) + "ms");
         for (int i = 0; i < chemin_global.size(); i++) {
             resultat.insereQueue(niveau.deplace(chemin_global.get(i)[0], chemin_global.get(i)[1]));
         }
@@ -114,7 +117,7 @@ public class IAASTAR extends IA{
      }
 
 
-    private Result deplacement_caisse(Niveau n, int startl, int startc, int destl, int destc, int max_depth) {
+    private Result deplacement_caisse(Niveau n, int startl, int startc, int destl, int destc, boolean desactiver_deplacement_caisse, int max_depth) {
         PriorityQueue<Case2> fap = new PriorityQueue<>(new Case2Comparator());
         fap.add(new Case2(new ArrayList<>(), null, startl, startc, n.clone()));
         int depth = 0;
@@ -163,7 +166,7 @@ public class IAASTAR extends IA{
                     accept_case2(fap, new ArrayList<>(), pere, fils, destl, destc);
                 }
                 else {
-                    ArrayList<Case> chemin = deplacement_pousseur(pere.niveau, objectivel, objectivec, pere.l, pere.c);
+                    ArrayList<Case> chemin = deplacement_pousseur(pere.niveau, objectivel, objectivec, pere.l, pere.c, desactiver_deplacement_caisse);
                     if (chemin.size() > 0) {
                         accept_case2(fap, chemin, pere, fils, destl, destc);
                     }
@@ -189,7 +192,7 @@ public class IAASTAR extends IA{
 
 
 
-    private ArrayList<Case> deplacement_pousseur(Niveau n, int destl, int destc, int caissel, int caissec){
+    private ArrayList<Case> deplacement_pousseur(Niveau n, int destl, int destc, int caissel, int caissec, boolean desactiver_deplacement_caisse){
         ArrayList<Case> chemin = new ArrayList<>();
         ArrayDeque<Case> fifo = new ArrayDeque<>();
         boolean[][] cases_availables = niveau.case_checked();
@@ -216,7 +219,7 @@ public class IAASTAR extends IA{
                     cases_availables[fils.l][fils.c] = false;
                     if (!n.aMur(fils.l, fils.c) && !n.aPousseur(fils.l, fils.c) && (fils.l != caissel || fils.c != caissec)) {
                         if (n.aCaisse(fils.l, fils.c)) {
-                            if (n.aBut(fils.l, fils.c))
+                            if (n.aBut(fils.l, fils.c) || desactiver_deplacement_caisse)
                                 continue;
                             int dCaisL = fils.l - current.l + fils.l;
                             int dCaisC = fils.c - current.c + fils.c;

@@ -29,6 +29,8 @@ package Modele;
 import Global.Configuration;
 import Structures.Iterateur;
 
+import java.util.ArrayList;
+
 public class Niveau implements Cloneable {
 	static final int VIDE = 0;
 	static final int MUR = 1;
@@ -178,6 +180,38 @@ public class Niveau implements Cloneable {
 		return cp;
 	}
 
+	void print() {
+		for (int i = 0; i < l; i++) {
+			for (int j = 0; j < c; j++) {
+				boolean drawn = false;
+				if ((cases[i][j] & MUR) != 0) {
+					System.out.printf("#");
+					drawn = true;
+				}
+				if ((cases[i][j] & CAISSE) != 0) {
+					System.out.printf("C");
+					drawn = true;
+
+				}
+				if ((cases[i][j] & POUSSEUR) != 0) {
+					System.out.printf("P");
+					drawn = true;
+
+				}
+				if ((cases[i][j] & BUT) != 0 && !drawn) {
+					System.out.printf("B");
+					drawn = true;
+
+				}
+				if (!drawn) {
+					System.out.printf(" ");
+
+				}
+			}
+			System.out.printf("\n");
+		}
+	}
+
 	void ajouteMur(int i, int j) {
 		ajoute(MUR, i, j);
 	}
@@ -242,33 +276,33 @@ public class Niveau implements Cloneable {
 		return pousseurC;
 	}
 
-	public int[] caisselc() {
-		int[] resultat = new int[2];
+	public ArrayList<int[]> caisselc() {
+		ArrayList<int[]> resultat = new ArrayList<>();
 		for (int i=0; i<l; i++){
 			for (int j=0; j<c; j++){
-				if (aCaisse(i,j)) {
-					resultat[0] = i;
-					resultat[1] = j;
-					return resultat;}
+				if (aCaisse(i, j) && !aBut(i, j)) {
+					int[] t = new int[2];
+					t[0] = i;
+					t[1] = j;
+					resultat.add(t);
+				}
 			}
 		}
-		resultat[0]=-1;
-		resultat[1]=-1;
 		return resultat;
 	}
 
-	public int[] objectivelc() {
-		int[] resultat = new int[2];
-		for (int i=0; i<l; i++){
+	public ArrayList<int[]> objectivelc() {
+			ArrayList<int[]> resultat = new ArrayList<>();
+			for (int i=0; i<l; i++){
 			for (int j=0; j<c; j++){
-				if (aBut(i,j)) {
-					resultat[0] = i;
-					resultat[1] = j;
-					return resultat;}
+				if (aBut(i, j) && !aCaisse(i, j)) {
+					int[] t = new int[2];
+					t[0] = i;
+					t[1] = j;
+					resultat.add(t);
+				}
 			}
 		}
-		resultat[0]=-1;
-		resultat[1]=-1;
 		return resultat;
 	}
 

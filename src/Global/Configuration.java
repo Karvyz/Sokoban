@@ -42,7 +42,7 @@ public class Configuration {
 	public static final int lenteurPas = 15;
 	public static final boolean animations = true;
 	public static final String IA = "ASTAR";
-	public static int lenteurJeuAutomatique = 15;
+	public static int lenteurJeuAutomatique = 4;
 
 	public static InputStream ouvre(String s) {
 		InputStream in = null;

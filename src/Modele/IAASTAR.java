@@ -50,16 +50,51 @@ public class IAASTAR extends IA{
             return c1.priorite - c2.priorite;
         }
     }
+
+    ArrayList<int[]> enumeration(Niveau n) {
+        Queue<int[]> caisses = new ArrayDeque<>(n.caisselc());
+        Queue<int[]> destinations = new ArrayDeque<>(n.objectivelc());
+        int k = caisses.size();
+        for (int j = 0; j < k; j++) {
+            int[] caisse = caisses.poll();
+            for (int i = 0; i < destinations.size(); i++) {
+                int[] destination = destinations.poll();
+                System.out.println("test chemin" + Arrays.toString(caisse) + " " + Arrays.toString(destination));
+
+                Result result = deplacement_caisse(n, caisse[0], caisse[1], destination[0], destination[1], 1000);
+
+                if (result != null) {
+                    System.out.println("chemin possible");
+                    result.niveau.print();
+                    if (caisses.size() == 0) {
+                        return result.chemin;
+                    }
+                    ArrayList<int[]> suite_chemin = enumeration(result.niveau);
+                    if (suite_chemin != null) {
+                        System.out.println("chemin valide");
+                        result.chemin.addAll(suite_chemin);
+                        return result.chemin;
+                    }
+                }
+                destinations.add(destination);
+            }
+            caisses.add(caisse);
+        }
+        return null;
+    }
+
     @Override
     public Sequence<Coup> joue() {
         Sequence<Coup> resultat = Configuration.nouvelleSequence();
-        int[] caisse = niveau.caisselc();
-        int[] destination = niveau.objectivelc();
         long start_timer = System.currentTimeMillis();
-        ArrayList<Case> chemin = deplacement_caisse(caisse[0], caisse[1], destination[0], destination[1]);
+        ArrayList<int[]> chemin_global = enumeration(niveau);
+        if (chemin_global == null) {
+            System.out.println("pas de chemin possible");
+            return resultat;
+        }
         System.out.println("Duree de recherche : " + (System.currentTimeMillis() - start_timer) + "ms");
-        for (int i = 0; i < chemin.size() - 1; i++) {
-            resultat.insereQueue(niveau.deplace(chemin.get(i + 1).l - chemin.get(i).l, chemin.get(i + 1).c - chemin.get(i).c));
+        for (int i = 0; i < chemin_global.size(); i++) {
+            resultat.insereQueue(niveau.deplace(chemin_global.get(i)[0], chemin_global.get(i)[1]));
         }
         return resultat;
     }
@@ -68,24 +103,49 @@ public class IAASTAR extends IA{
         return Math.abs(l1 - l2) + Math.abs(c1 - c2);
     }
 
-    private ArrayList<Case> deplacement_caisse(int startl, int startc, int destl, int destc) {
+     class Result {
+        ArrayList<int[]> chemin;
+        Niveau niveau;
+
+         public Result(ArrayList<int[]> chemin, Niveau niveau) {
+             this.chemin = chemin;
+             this.niveau = niveau;
+         }
+     }
+
+
+    private Result deplacement_caisse(Niveau n, int startl, int startc, int destl, int destc, int max_depth) {
         PriorityQueue<Case2> fap = new PriorityQueue<>(new Case2Comparator());
-        fap.add(new Case2(new ArrayList<>(), null, startl, startc, niveau.clone()));
-        while (!fap.isEmpty()){
+        fap.add(new Case2(new ArrayList<>(), null, startl, startc, n.clone()));
+        int depth = 0;
+        while (!fap.isEmpty() && depth < max_depth){
+            depth++;
             Case2 pere = fap.poll();
             if (pere.l == destl && pere.c == destc) {
                 ArrayList<ArrayList<Case>> chemins = new ArrayList<>();
+                ArrayList<Niveau> niveaus = new ArrayList<>();
+                Niveau niveau_actuel = pere.niveau;
                 while(pere != null) {
+                    niveaus.add(pere.niveau);
                     chemins.add(pere.chemin);
                     pere = pere.pere;
                 }
+                Collections.reverse(niveaus);
+//                niveaus.forEach(Niveau::print);
                 Collections.reverse(chemins);
                 ArrayList<Case> chemin_global = new ArrayList<>();
-                chemin_global.add(new Case(niveau.pousseurL, niveau.pousseurC, null));
+                chemin_global.add(new Case(n.pousseurL, n.pousseurC, null));
                 for (ArrayList<Case> chemin : chemins) {
                     chemin_global.addAll(chemin);
                 }
-                return chemin_global;
+                ArrayList<int[]> resultat = new ArrayList<>();
+                for (int i = 0; i < chemin_global.size() - 1; i++) {
+                    int[] t = new int[2];
+                    t[0] = chemin_global.get(i + 1).l - chemin_global.get(i).l;
+                    t[1] = chemin_global.get(i + 1).c - chemin_global.get(i).c;
+                    resultat.add(t);
+                }
+                return new Result(resultat, niveau_actuel);
             }
             ArrayList<Case2> liste_fils = new ArrayList<>();
             liste_fils.add(new Case2(null, pere, pere.l + 1, pere.c));
@@ -94,7 +154,7 @@ public class IAASTAR extends IA{
             liste_fils.add(new Case2(null, pere, pere.l, pere.c - 1));
             for (Case2 fils : liste_fils) {
 
-                if (fils.niveau.aMur(fils.l, fils.c))
+                if (fils.niveau.aMur(fils.l, fils.c) || fils.niveau.aCaisse(fils.l, fils.c))
                     continue;
 
                 int objectivel = pere.l + (pere.l - fils.l);
@@ -103,14 +163,14 @@ public class IAASTAR extends IA{
                     accept_case2(fap, new ArrayList<>(), pere, fils, destl, destc);
                 }
                 else {
-                    ArrayList<Case> chemin = deplacement_pousseur(pere.niveau, objectivel, objectivec);
+                    ArrayList<Case> chemin = deplacement_pousseur(pere.niveau, objectivel, objectivec, pere.l, pere.c);
                     if (chemin.size() > 0) {
                         accept_case2(fap, chemin, pere, fils, destl, destc);
                     }
                 }
             }
         }
-        return new ArrayList<>();
+        return null;
     }
 
     void accept_case2(PriorityQueue<Case2> fap, ArrayList<Case> chemin, Case2 pere, Case2 fils, int destl, int destc) {
@@ -129,7 +189,7 @@ public class IAASTAR extends IA{
 
 
 
-    private ArrayList<Case> deplacement_pousseur(Niveau n, int destl, int destc){
+    private ArrayList<Case> deplacement_pousseur(Niveau n, int destl, int destc, int caissel, int caissec){
         ArrayList<Case> chemin = new ArrayList<>();
         ArrayDeque<Case> fifo = new ArrayDeque<>();
         boolean[][] cases_availables = niveau.case_checked();
@@ -154,8 +214,20 @@ public class IAASTAR extends IA{
             for (Case fils :listeFils){
                 if (cases_availables[fils.l][fils.c]) {
                     cases_availables[fils.l][fils.c] = false;
-                    if (n.estOccupable(fils.l, fils.c)) {
-                        fifo.add(fils);
+                    if (!n.aMur(fils.l, fils.c) && !n.aPousseur(fils.l, fils.c) && (fils.l != caissel || fils.c != caissec)) {
+                        if (n.aCaisse(fils.l, fils.c)) {
+                            if (n.aBut(fils.l, fils.c))
+                                continue;
+                            int dCaisL = fils.l - current.l + fils.l;
+                            int dCaisC = fils.c - current.c + fils.c;
+
+                            if (n.estOccupable(dCaisL, dCaisC)) {
+                                fifo.add(fils);
+                            }
+                        }
+                        else {
+                            fifo.add(fils);
+                        }
                     }
                 }
             }

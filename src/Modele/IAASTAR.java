@@ -59,21 +59,15 @@ public class IAASTAR extends IA{
             int[] caisse = caisses.poll();
             for (int i = 0; i < destinations.size(); i++) {
                 int[] destination = destinations.poll();
-                System.out.println("test chemin" + Arrays.toString(caisse) + " " + Arrays.toString(destination));
 
-                Result result = deplacement_caisse(n, caisse[0], caisse[1], destination[0], destination[1] ,true, 100);
-                if (result == null)
-                    result = deplacement_caisse(n, caisse[0], caisse[1], destination[0], destination[1] ,false, 100);
+                Result result = deplacement_caisse(n, caisse[0], caisse[1], destination[0], destination[1], 500);
 
                 if (result != null) {
-                    System.out.println("chemin possible");
-                    result.niveau.print();
                     if (caisses.size() == 0) {
                         return result.chemin;
                     }
                     ArrayList<int[]> suite_chemin = enumeration(result.niveau);
                     if (suite_chemin != null) {
-                        System.out.println("chemin valide");
                         result.chemin.addAll(suite_chemin);
                         return result.chemin;
                     }
@@ -117,7 +111,7 @@ public class IAASTAR extends IA{
      }
 
 
-    private Result deplacement_caisse(Niveau n, int startl, int startc, int destl, int destc, boolean desactiver_deplacement_caisse, int max_depth) {
+    private Result deplacement_caisse(Niveau n, int startl, int startc, int destl, int destc, int max_depth) {
         PriorityQueue<Case2> fap = new PriorityQueue<>(new Case2Comparator());
         fap.add(new Case2(new ArrayList<>(), null, startl, startc, n.clone()));
         int depth = 0;
@@ -166,9 +160,15 @@ public class IAASTAR extends IA{
                     accept_case2(fap, new ArrayList<>(), pere, fils, destl, destc);
                 }
                 else {
-                    ArrayList<Case> chemin = deplacement_pousseur(pere.niveau, objectivel, objectivec, pere.l, pere.c, desactiver_deplacement_caisse);
+                    ArrayList<Case> chemin = deplacement_pousseur(pere.niveau, objectivel, objectivec, pere.l, pere.c, true);
                     if (chemin.size() > 0) {
                         accept_case2(fap, chemin, pere, fils, destl, destc);
+                    }
+                    else {
+                        chemin = deplacement_pousseur(pere.niveau, objectivel, objectivec, pere.l, pere.c, false);
+                        if (chemin.size() > 0) {
+                            accept_case2(fap, chemin, pere, fils, destl, destc);
+                        }
                     }
                 }
             }

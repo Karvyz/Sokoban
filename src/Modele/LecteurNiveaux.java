@@ -71,16 +71,30 @@ public class LecteurNiveaux {
 		}
 	}
 
+        // Une ligne est valide (i.e., appartient à la description du niveau)
+        // si elle commence par des espaces (éventuellement zéro) suivis par un 
+        // '#' (mur du niveau).
+        Boolean ligneValide(String ligne) {
+            int h = ligne.indexOf('#');
+            if (h == -1) return false;
+            for (int i=0; i<h; i++) {
+                if (ligne.charAt(i) != ' ') {
+                    return false;
+                }
+            }
+            return true;
+        }
+
 	Niveau lisProchainNiveau() {
 		n = new Niveau();
 		String ligne = "";
-		while (ligne.length() == 0) {
+		while (! ligneValide(ligne)) {
 			ligne = lisLigne();
 			if (ligne == null)
 				return null;
 		}
 		int i = 0;
-		while ((ligne != null) && (ligne.length() > 0)) {
+		while ((ligne != null) && ligneValide(ligne)) {
 			for (int j = 0; j < ligne.length(); j++) {
 				char c = ligne.charAt(j);
 				n.videCase(i, j);

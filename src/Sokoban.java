@@ -40,7 +40,7 @@ public class Sokoban {
 
 	public static void main(String[] args) {
 		InputStream in;
-		in = Configuration.ouvre("Niveaux/Original.txt");
+		in = Configuration.ouvre("Niveaux/Minicosmos.txt");
 		Configuration.info("Niveaux trouvés");
 
 		LecteurNiveaux l = new LecteurNiveaux(in);
